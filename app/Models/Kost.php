@@ -15,7 +15,7 @@ class Kost extends Model
         'alamat',
         'lokasi',
         'harga',
-        'gambar',
+        'foto',
         'fasilitas'
     ];
 
