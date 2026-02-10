@@ -3,19 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RumahKost</title>
+    <title>{{ config('app.name', 'RumahKost') }}</title>
+
+    <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Alpine JS -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body class="bg-white text-gray-800">
 
-    {{-- NAVBAR --}}
+{{-- ================= NAVBAR ================= --}}
 <nav class="bg-white border-b sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         
         <div class="flex-shrink-0">
-            <a href="/" class="text-2xl font-bold text-[#0047FF]">
+            <a href="{{ route('home') }}" class="text-2xl font-bold text-[#0047FF]">
                 Rumah<span class="text-[#FFB800]">Kost</span>
             </a>
         </div>
@@ -35,7 +41,7 @@
 
         <div class="flex items-center gap-6">
             <div class="hidden md:flex items-center gap-6 text-sm font-semibold text-gray-700">
-                <a href="#" class="hover:text-blue-600">Beranda</a>
+                <a href="{{ route('home') }}" class="hover:text-blue-600">Beranda</a>
                 <a href="#" class="hover:text-blue-600">Favorit</a>
             </div>
             
@@ -43,24 +49,33 @@
                 Sewa
             </button>
 
-            <div class="flex items-center gap-2 border border-gray-300 px-2 py-1 rounded-full shadow-sm cursor-pointer hover:shadow-md transition bg-white">
-                <i class="fa fa-bars text-gray-500 ml-1 text-xs"></i>
+            {{-- USER DROPDOWN --}}
+            <a href="{{ route('profile.index') }}" class="flex items-center gap-2 border border-gray-300 px-2 py-1 rounded-full shadow-sm cursor-pointer hover:shadow-md transition bg-white">
                 <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
-                    <i class="fa fa-user text-gray-400"></i>
+                    @auth
+                        <img
+                            src="{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) }}"
+                            class="w-full h-full object-cover"
+                        >
+                    @else
+                        <i class="fa fa-user text-gray-400"></i>
+                    @endauth
                 </div>
-                <span class="text-xs font-bold pr-2">Kim seonho</span>
-            </div>
+                <span class="text-xs font-bold pr-2">
+                    @auth {{ Auth::user()->name }} @else Guest @endauth
+                </span>
+            </a>
         </div>
     </div>
 </nav>
 
-    {{-- CONTENT --}}
-    <main>
-        @yield('content')
-    </main>
+{{-- ================= CONTENT ================= --}}
+<main>
+    @yield('content')
+</main>
 
-    {{-- FOOTER --}}
-  <footer class="bg-white pt-20 border-t mt-32">
+{{-- ================= FOOTER ================= --}}
+<footer class="bg-white pt-20 border-t mt-32">
     <div class="max-w-7xl mx-auto px-6">
         <div class="grid grid-cols-1 md:grid-cols-12 gap-12 pb-20">
             
@@ -131,7 +146,7 @@
     <div class="bg-[#0047FF] py-4">
         <p class="text-white text-center text-xs font-light">
             © Copyright RumahKost 2024. All right reserved
-        </div>
+        </p>
     </div>
 </footer>
 
