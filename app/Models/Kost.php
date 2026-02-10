@@ -9,7 +9,6 @@ class Kost extends Model
 {
     use HasFactory;
 
-    // Kolom yang boleh diisi mass assignment
     protected $fillable = [
         'nama',
         'alamat',
@@ -19,7 +18,6 @@ class Kost extends Model
         'fasilitas'
     ];
 
-    // Cast JSON → array otomatis
     protected $casts = [
         'fasilitas' => 'array'
     ];
