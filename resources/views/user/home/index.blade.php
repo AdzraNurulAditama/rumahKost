@@ -32,32 +32,7 @@
             >
         </template>
 
-        <div class="relative text-center text-white z-10">
-            <h1 class="text-6xl font-bold mb-2 italic">
-                Rumah<span class="text-orange-300">Kost</span>
-            </h1>
-            <p class="text-xl font-light mb-8">
-                Kosan nyaman & strategis di Karawang
-            </p>
-
-            <div class="flex justify-center gap-16 text-center">
-                <div>
-                    <span class="block text-3xl font-bold">{{ $kosts->count() }}</span>
-                    <span class="text-xs">Pilihan kost</span>
-                </div>
-
-                <div class="border-l border-white/30 px-16">
-                    <span class="block text-3xl font-bold italic">Karawang</span>
-                    <span class="text-xs">Lokasi strategis</span>
-                </div>
-
-                <div class="border-l border-white/30 pl-16">
-                    <span class="block text-3xl font-bold">100</span>
-                    <span class="text-xs">Penghuni puas</span>
-                </div>
-            </div>
-        </div>
-    </div>
+  
 
     <div class="mt-8 ml-12">
         <button

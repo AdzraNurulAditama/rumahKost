@@ -25,6 +25,6 @@ class HomeController extends Controller
 
         $kosts = $query->get();
 
-        return view('user.home.home', compact('kosts'));
+        return view('user.home.index', compact('kosts'));
     }
 }
