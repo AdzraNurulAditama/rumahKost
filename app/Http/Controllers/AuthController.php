@@ -9,15 +9,26 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
+    // ======================
+    // FORM LOGIN
+    // ======================
+    public function showLogin()
+    {
+        return view('user.auth.login');
+    }
+
+    // ======================
+    // PROSES REGISTER
+    // ======================
     public function register(Request $request)
     {
         $request->validate([
-            'username' => 'required|unique:users',
-            'email' => 'required|email|unique:users',
-            'nomor_telepon' => 'required',
+            'username' => 'required|string|max:255|unique:users',
+            'email' => 'required|string|email|max:255|unique:users',
+            'nomor_telepon' => 'required|string|max:20',
             'jenis_kelamin' => 'required',
             'status' => 'required',
-            'password' => 'required|min:8|confirmed',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
         $user = User::create([
@@ -29,18 +40,18 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        // langsung login setelah register
+        // Login otomatis setelah register
         Auth::login($user);
+
+        // Regenerate session (security)
+        $request->session()->regenerate();
 
         return redirect()->route('dashboard');
     }
-     // FORM LOGIN
-    public function showLogin()
-    {
-        return view('user.auth.login');
-    }
 
+    // ======================
     // PROSES LOGIN
+    // ======================
     public function login(Request $request)
     {
         $request->validate([
@@ -49,17 +60,27 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($request->only('email', 'password'))) {
+
+            // Regenerate session (WAJIB untuk security)
+            $request->session()->regenerate();
+
             return redirect()->route('dashboard');
         }
 
         return back()->with('error', 'Email atau password salah');
     }
 
+    // ======================
     // LOGOUT
-    public function logout()
+    // ======================
+    public function logout(Request $request)
     {
         Auth::logout();
+
+        // Hapus session
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
         return redirect()->route('login');
     }
 }
-

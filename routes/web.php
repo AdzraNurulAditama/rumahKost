@@ -3,6 +3,7 @@
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\KelolaKostController; 
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -41,10 +42,9 @@ Route::post('/logout', [AuthController::class, 'logout'])
 
 Route::middleware('auth')->group(function () {
 
-    // DASHBOARD
-    Route::get('/dashboard', function () {
-        return view('user.home.dashboard');
-    })->name('dashboard');
+    // DASHBOARD USER
+    Route::get('/dashboard', [HomeController::class, 'dashboard'])
+        ->name('dashboard');
 
     // PROFILE
     Route::get('/profile', [UserProfileController::class, 'index'])
@@ -55,4 +55,31 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/profile/password', [UserProfileController::class, 'updatePassword'])
         ->name('profile.password');
+
+    /*
+    |--------------------------------------------------------------------------
+    | ADMIN AREA (KELOLA KOST) - SESUAI DESAIN DASHBOARD ADMIN
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('admin')->name('admin.')->group(function () {
+        
+        // Halaman Utama Tabel Kelola Kost
+        Route::get('/kost', [KelolaKostController::class, 'index'])->name('kost.index');
+        
+        // Form Tambah Kost Baru
+        Route::get('/kost/create', [KelolaKostController::class, 'create'])->name('kost.create');
+        
+        // Simpan Data Kost
+        Route::post('/kost', [KelolaKostController::class, 'store'])->name('kost.store');
+        
+        // Form Edit Kost
+        Route::get('/kost/{id}/edit', [KelolaKostController::class, 'edit'])->name('kost.edit');
+        
+        // Update Data Kost
+        Route::put('/kost/{id}', [KelolaKostController::class, 'update'])->name('kost.update');
+        
+        // Hapus Data Kost
+        Route::delete('/kost/{id}', [KelolaKostController::class, 'destroy'])->name('kost.destroy');
+    });
+
 });

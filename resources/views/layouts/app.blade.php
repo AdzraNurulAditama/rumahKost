@@ -61,8 +61,11 @@
                         <i class="fa fa-user text-gray-400"></i>
                     @endauth
                 </div>
-                <span class="text-xs font-bold pr-2">
-                    @auth {{ Auth::user()->name }} @else Guest @endauth
+                @auth
+                    <span class="text-xs font-bold pr-2">
+                        {{ auth()->user()->username }}
+                    </span>
+                @endauth
                 </span>
             </a>
         </div>

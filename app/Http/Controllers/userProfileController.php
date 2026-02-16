@@ -11,7 +11,7 @@ class userProfileController extends Controller
 {
     public function index()
     {
-        return view('profile.profile', [
+        return view('user.profile.profile', [
             'user' => Auth::user(),
         ]);
     }

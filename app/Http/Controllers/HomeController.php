@@ -7,6 +7,12 @@ use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
+    public function dashboard()
+{
+    $kosts = Kost::latest()->get();
+
+    return view('user.home.index', compact('kosts'));
+}
     public function index(Request $request)
     {
         $query = Kost::query();
