@@ -51,7 +51,7 @@
             </button>
 
             {{-- USER DROPDOWN --}}
-            <a href="{{ route('profile') }}" class="flex items-center gap-2 border border-gray-300 px-2 py-1 rounded-full shadow-sm cursor-pointer hover:shadow-md transition bg-white">
+            <a href="{{ route('user.profile') }}" class="flex items-center gap-2 border border-gray-300 px-2 py-1 rounded-full shadow-sm cursor-pointer hover:shadow-md transition bg-white">
                 <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden border border-gray-50">
                     @auth
                         {{-- Logika Inisial Navbar --}}

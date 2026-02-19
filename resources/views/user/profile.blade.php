@@ -42,7 +42,7 @@
                         <a href="#" class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-gray-600 hover:bg-white/50 transition rounded-xl">
                             <i class="fa-solid fa-ticket w-4 text-gray-500"></i> Voucher
                         </a>
-                        <a href="#" class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-gray-600 hover:bg-white/50 transition rounded-xl">
+                        <a href="{{ route('user.disukai') }}" class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-gray-600 hover:bg-white/50 transition rounded-xl">
                             <i class="fa-solid fa-heart w-4 text-gray-500"></i> Disukai
                         </a>
                         <a href="#" class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-gray-600 hover:bg-white/50 transition rounded-xl">
@@ -110,7 +110,7 @@
 
                 {{-- Form Section --}}
                 <div class="flex-1 max-w-[500px]">
-                    <form action="{{ route('profile.update') }}" method="POST" class="space-y-5">
+                    <form action="{{ route('user.profile.update') }}" method="POST" class="space-y-5">
                         @csrf
                         {{-- Nama Lengkap --}}
                         <div class="space-y-1.5">

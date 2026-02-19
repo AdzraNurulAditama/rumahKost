@@ -60,10 +60,5 @@ class userProfileController extends Controller
 
         return back()->with('success', 'Password berhasil diperbarui.');
     }
-
-    public function disukai()
-    {
-        $user = Auth::user();
-        return view('user.disukai', compact('user'));
-    }
+    
 }
