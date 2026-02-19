@@ -47,15 +47,12 @@ Route::middleware('auth')->group(function () {
         ->name('dashboard');
 
     // PROFILE
-    Route::get('/profile', [UserProfileController::class, 'index'])
-        ->name('profile');
-
-    Route::post('/profile/update', [UserProfileController::class, 'update'])
-        ->name('profile.update');
-
-    Route::post('/profile/password', [UserProfileController::class, 'updatePassword'])
-        ->name('profile.password');
-
+    Route::get('/profile', [userProfileController::class, 'index'])->name('user.profile');
+    Route::post('/profile/update', [userProfileController::class, 'update'])->name('user.profile.update');
+    Route::post('/profile/password', [userProfileController::class, 'updatePassword'])->name('user.password.update');
+    
+    Route::get('/profile/disukai', [userProfileController::class, 'disukai'])->name('user.disukai');
+    Route::get('/profile/voucher', [userProfileController::class, 'voucher'])->name('user.voucher');
     /*
     |--------------------------------------------------------------------------
     | ADMIN AREA (KELOLA KOST) - SESUAI DESAIN DASHBOARD ADMIN
@@ -82,4 +79,5 @@ Route::middleware('auth')->group(function () {
         Route::delete('/kost/{id}', [KelolaKostController::class, 'destroy'])->name('kost.destroy');
     });
 
+    
 });

@@ -11,7 +11,7 @@ class HomeController extends Controller
 {
     $kosts = Kost::latest()->get();
 
-    return view('user.home.index', compact('kosts'));
+    return view('user.home', compact('kosts'));
 }
     public function index(Request $request)
     {
@@ -31,6 +31,6 @@ class HomeController extends Controller
 
         $kosts = $query->get();
 
-        return view('user.home.index', compact('kosts'));
+        return view('user.home', compact('kosts'));
     }
 }

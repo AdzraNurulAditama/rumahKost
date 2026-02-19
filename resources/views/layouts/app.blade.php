@@ -16,6 +16,7 @@
 </head>
 <body class="bg-white text-gray-800">
 
+
 {{-- ================= NAVBAR ================= --}}
 <nav class="bg-white border-b sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
@@ -51,11 +52,16 @@
 
             {{-- USER DROPDOWN --}}
             <a href="{{ route('profile') }}" class="flex items-center gap-2 border border-gray-300 px-2 py-1 rounded-full shadow-sm cursor-pointer hover:shadow-md transition bg-white">
-                <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
+                <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden border border-gray-50">
                     @auth
+                        {{-- Logika Inisial Navbar --}}
+                        @php
+                            $navName = Auth::user()->name ?? Auth::user()->username ?? Auth::user()->email ?? 'U';
+                        @endphp
                         <img
-                            src="{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) }}"
+                            src="https://ui-avatars.com/api/?name={{ urlencode($navName) }}&background=DBEAFE&color=2563EB&size=64&format=svg"
                             class="w-full h-full object-cover"
+                            alt="User Inisial"
                         >
                     @else
                         <i class="fa fa-user text-gray-400"></i>
@@ -63,15 +69,13 @@
                 </div>
                 @auth
                     <span class="text-xs font-bold pr-2">
-                        {{ auth()->user()->username }}
+                        {{ Auth::user()->username ?? explode('@', Auth::user()->email)[0] }}
                     </span>
                 @endauth
-                </span>
             </a>
         </div>
     </div>
 </nav>
-
 {{-- ================= CONTENT ================= --}}
 <main>
     @yield('content')

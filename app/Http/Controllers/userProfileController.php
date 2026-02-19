@@ -7,13 +7,15 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
+
 class userProfileController extends Controller
 {
     public function index()
     {
-        return view('user.profile.profile', [
-            'user' => Auth::user(),
-        ]);
+        // Mengambil data user yang sedang login
+    $user = \Illuminate\Support\Facades\Auth::user();
+
+    return view('user.profile', compact('user'));
     }
 
     public function update(Request $request)
@@ -57,5 +59,11 @@ class userProfileController extends Controller
         ]);
 
         return back()->with('success', 'Password berhasil diperbarui.');
+    }
+
+    public function disukai()
+    {
+        $user = Auth::user();
+        return view('user.disukai', compact('user'));
     }
 }
