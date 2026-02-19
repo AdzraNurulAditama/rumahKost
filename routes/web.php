@@ -4,7 +4,8 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DisukaiController;
-use App\Http\Controllers\KelolaKostController; 
+use App\Http\Controllers\KelolaKostController;
+use App\Http\Controllers\userProfileController as ControllersUserProfileController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -52,8 +53,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/update', [userProfileController::class, 'update'])->name('user.profile.update');
     Route::post('/profile/password', [userProfileController::class, 'updatePassword'])->name('user.password.update');
     
-    Route::get('/profile/disukai', [DisukaiController::class, 'index'])->name('user.disukai');
+    Route::get('/profile/disukai', [DisukaiController::class, 'index'])->name('user.disukai'); // disukai contrller
     Route::get('/profile/voucher', [userProfileController::class, 'voucher'])->name('user.voucher');
+    Route::delete('/profile/photo/delete', [UserProfileController::class, 'deletePhoto'])->name('user.profile.photo.delete');
     /*
     |--------------------------------------------------------------------------
     | ADMIN AREA (KELOLA KOST) - SESUAI DESAIN DASHBOARD ADMIN

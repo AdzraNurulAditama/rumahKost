@@ -17,30 +17,41 @@
         
         {{-- SIDEBAR KIRI (Tetap Sama) --}}
         <div class="w-full md:w-[280px] bg-[#E9F0FF] rounded-[32px] p-4 min-h-[85vh]">
+            {{-- User Mini Card --}}
             <div class="bg-white rounded-[24px] p-6 mb-6 flex flex-col items-center text-center">
                 <div class="w-16 h-16 mb-3">
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name ?? 'User') }}&background=DBEAFE&color=2563EB&size=128" 
-                         class="w-full h-full rounded-full object-cover border-2 border-white" alt="Avatar">
+                    @php
+                        $displayUsername = $user->username ?? $user->email ?? 'User';
+                    @endphp
+                    
+                    {{-- Logika Tampilan Foto --}}
+                    @if($user->photo)
+                        <img src="{{ asset('storage/' . $user->photo) }}" 
+                            class="w-full h-full rounded-full object-cover border-2 border-white shadow-sm"
+                            alt="Avatar">
+                    @else
+                        <img src="https://ui-avatars.com/api/?name={{ urlencode($displayUsername) }}&background=DBEAFE&color=2563EB&size=128" 
+                            class="w-full h-full rounded-full object-cover border-2 border-white"
+                            alt="Avatar">
+                    @endif
                 </div>
-                <h3 class="font-bold text-gray-800 text-sm tracking-tight">{{ $user->name ?? 'Kim Seonho' }}</h3>
+                <h3 class="font-bold text-gray-800 text-sm tracking-tight">{{ $user->username ?? 'Kim Seonho' }}</h3>
                 <p class="text-[10px] text-gray-400 break-all">{{ $user->email ?? 'Seonho@gmail.com' }}</p>
             </div>
 
+            {{-- Navigasi Menu --}}
             <nav class="space-y-6 px-2">
                 <div>
                     <p class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-3 px-2">Aktivitas</p>
                     <div class="space-y-1">
-                        <a href="#" class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-gray-600 hover:bg-white/50 transition rounded-xl">
+                        <a href="#" class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-gray-600 bg-white rounded-xl shadow-sm border border-gray-50">
                             <i class="fa-solid fa-clipboard-list w-4 text-gray-500"></i> Daftar Transaksi
                         </a>
-                        <a href="{{ route('user.voucher') }}" 
-                            class="flex items-center gap-3 px-4 py-2.5 text-[13px] {{ request()->routeIs('user.voucher') ? 'text-blue-600 bg-white shadow-sm border border-blue-50 font-bold' : 'text-gray-600 hover:bg-white/50' }} transition rounded-xl">
-                                <i class="fa-solid fa-ticket w-4"></i> Voucher
-                            </a>
-                        {{-- Menu Aktif: Disukai --}}
-                        <a href="{{ route('user.disukai') }}" 
-                        class="flex items-center gap-3 px-4 py-2.5 text-[13px] {{ request()->routeIs('user.disukai') ? 'text-blue-600 bg-white shadow-sm border border-blue-50 font-bold' : 'text-gray-600 hover:bg-white/50' }} transition rounded-xl">
-                            <i class="fa-solid fa-heart w-4"></i> Disukai
+                        <a href="#" class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-gray-600 hover:bg-white/50 transition rounded-xl">
+                            <i class="fa-solid fa-ticket w-4 text-gray-500"></i> Voucher
+                        </a>
+                        <a href="{{ route('user.disukai') }}" class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-gray-600 hover:bg-white/50 transition rounded-xl">
+                            <i class="fa-solid fa-heart w-4 text-gray-500"></i> Disukai
                         </a>
                         <a href="#" class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-gray-600 hover:bg-white/50 transition rounded-xl">
                             <i class="fa-solid fa-house w-4 text-gray-500"></i> Kosan Saya
@@ -57,9 +68,8 @@
                 <div>
                     <p class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-3 px-2">Akun</p>
                     <div class="space-y-1">
-                        <a href="{{ route('user.profile') }}" 
-                        class="flex items-center gap-3 px-4 py-2.5 text-[13px] {{ request()->routeIs('user.profile') ? 'text-blue-600 bg-white shadow-sm border border-blue-50 font-bold' : 'text-gray-600 hover:bg-white/50' }} transition rounded-xl">
-                            <i class="fa-solid fa-user w-4"></i> Akun
+                        <a href="{{ route('user.profile') }}" class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-blue-600 bg-white rounded-xl shadow-sm border border-blue-50 font-bold">
+                            <i class="fa-solid fa-user w-4 text-blue-600"></i> Akun
                         </a>
                         <a href="#" class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-gray-600 hover:bg-white/50 transition rounded-xl">
                             <i class="fa-solid fa-location-dot w-4 text-gray-500"></i> Alamat

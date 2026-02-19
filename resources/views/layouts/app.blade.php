@@ -3,15 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ config('app.name', 'RumahKost') }}</title>
+    <title>RumahKost</title>
 
-    <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Alpine JS -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-    <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body class="bg-white text-gray-800">
@@ -43,7 +40,7 @@
         <div class="flex items-center gap-6">
             <div class="hidden md:flex items-center gap-6 text-sm font-semibold text-gray-700">
                 <a href="{{ route('home') }}" class="hover:text-blue-600">Beranda</a>
-                <a href="#" class="hover:text-blue-600">Favorit</a>
+                <a href="{{ route('user.disukai') }}" class="hover:text-blue-600">Favorit</a>
             </div>
             
             <button class="bg-[#0047FF] text-white px-7 py-2 rounded-lg font-bold text-sm shadow-md hover:bg-blue-700 transition">
@@ -54,19 +51,26 @@
             <a href="{{ route('user.profile') }}" class="flex items-center gap-2 border border-gray-300 px-2 py-1 rounded-full shadow-sm cursor-pointer hover:shadow-md transition bg-white">
                 <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden border border-gray-50">
                     @auth
-                        {{-- Logika Inisial Navbar --}}
                         @php
-                            $navName = Auth::user()->name ?? Auth::user()->username ?? Auth::user()->email ?? 'U';
+                            $user = Auth::user();
+                            $navName = $user->username ?? $user->email ?? 'U';
                         @endphp
-                        <img
-                            src="https://ui-avatars.com/api/?name={{ urlencode($navName) }}&background=DBEAFE&color=2563EB&size=64&format=svg"
-                            class="w-full h-full object-cover"
-                            alt="User Inisial"
-                        >
+
+                        {{-- Logika Foto vs Inisial di Navbar --}}
+                        @if($user->photo)
+                            <img src="{{ asset('storage/' . $user->photo) }}" 
+                                 class="w-full h-full object-cover" 
+                                 alt="Profile Photo">
+                        @else
+                            <img src="https://ui-avatars.com/api/?name={{ urlencode($navName) }}&background=DBEAFE&color=2563EB&size=64"
+                                 class="w-full h-full object-cover"
+                                 alt="User Inisial">
+                        @endif
                     @else
                         <i class="fa fa-user text-gray-400"></i>
                     @endauth
                 </div>
+                
                 @auth
                     <span class="text-xs font-bold pr-2">
                         {{ Auth::user()->username ?? explode('@', Auth::user()->email)[0] }}
@@ -76,6 +80,7 @@
         </div>
     </div>
 </nav>
+
 {{-- ================= CONTENT ================= --}}
 <main>
     @yield('content')

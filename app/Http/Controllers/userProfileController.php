@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
 
+
 class userProfileController extends Controller
 {
     public function index()
@@ -22,23 +23,26 @@ class userProfileController extends Controller
     {
         $user = Auth::user();
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        ]);
+    $validated = $request->validate([
+        'username' => 'required|string|max:255', 
+        'email' => 'required|email|unique:users,email,' . $user->id,
+        'nomor_telepon' => 'nullable|string|max:15', 
+        'tanggal_lahir' => 'nullable|date',           
+        'jenis_kelamin' => 'nullable|string',         
+        'status' => 'nullable|string',         
+        'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+    ]);
 
-        if ($request->hasFile('photo')) {
-            if ($user->photo) {
-                Storage::disk('public')->delete($user->photo);
-            }
-
-            $validated['photo'] = $request->file('photo')->store('profile-photos', 'public');
+    if ($request->hasFile('photo')) {
+        if ($user->photo) {
+            Storage::disk('public')->delete($user->photo);
         }
+        $validated['photo'] = $request->file('photo')->store('profile-photos', 'public');
+    }
 
-        $user->update($validated);
+    $user->update($validated);
 
-        return back()->with('success', 'Profil berhasil diperbarui.');
+    return back()->with('success', 'Profil berhasil diperbarui.');
     }
 
     public function updatePassword(Request $request)
@@ -60,5 +64,23 @@ class userProfileController extends Controller
 
         return back()->with('success', 'Password berhasil diperbarui.');
     }
+
+    public function deletePhoto()
+{
+    $user = auth()->user();
+
+    // Cek jika user punya foto
+    if ($user->photo) {
+        // Hapus file fisik dari storage
+        Storage::disk('public')->delete($user->photo);
+
+        // Update database jadi null
+        $user->update(['photo' => null]);
+
+        return back()->with('success', 'Foto profil berhasil dihapus.');
+    }
+
+    return back()->with('error', 'Tidak ada foto untuk dihapus.');
+}
     
 }

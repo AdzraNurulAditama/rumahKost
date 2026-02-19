@@ -12,8 +12,10 @@ class DisukaiController extends Controller
      */
     public function index()
     {
+        // Ambil data user yang sedang login
         $user = \Illuminate\Support\Facades\Auth::user();
-        return view('user.disukai');
+
+        return view('user.disukai', compact('user'));
     }
 
     /**
