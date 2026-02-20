@@ -12,7 +12,7 @@ class KelolaKostController extends Controller
     public function index()
     {
         $kosts = Kost::latest()->paginate(3); // Paginate 3 sesuai jumlah di gambar kamu
-        return view('admin.kelolakost', compact('kosts'));
+        return view('admin.kelolakost.index', compact('kosts'));
     }
 
     // Proses Simpan Kost Baru

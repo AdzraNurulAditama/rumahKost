@@ -7,55 +7,57 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
-
-
-class userProfileController extends Controller
+class UserProfileController extends Controller // Nama class sebaiknya PascalCase
 {
     public function index()
     {
-        // Mengambil data user yang sedang login
-    $user = \Illuminate\Support\Facades\Auth::user();
-
-    return view('user.profile', compact('user'));
+        $user = Auth::user();
+        return view('user.profile', compact('user'));
     }
 
     public function update(Request $request)
     {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
-    $validated = $request->validate([
-        'username' => 'required|string|max:255', 
-        'email' => 'required|email|unique:users,email,' . $user->id,
-        'nomor_telepon' => 'nullable|string|max:15', 
-        'tanggal_lahir' => 'nullable|date',           
-        'jenis_kelamin' => 'nullable|string',         
-        'status' => 'nullable|string',         
-        'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
-    ]);
+        $validated = $request->validate([
+            'username'      => 'required|string|max:255', 
+            'email'         => 'required|email|unique:users,email,' . $user->id,
+            'nomor_telepon' => 'nullable|string|max:15', 
+            'tanggal_lahir' => 'nullable|date',           
+            'jenis_kelamin' => 'nullable|string|in:Laki-laki,Perempuan', // Tambahkan in: agar data valid
+            'status'        => 'nullable|string',         
+            'photo'         => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+        ]);
 
-    if ($request->hasFile('photo')) {
-        if ($user->photo) {
-            Storage::disk('public')->delete($user->photo);
+        if ($request->hasFile('photo')) {
+            // Hapus foto lama jika ada
+            if ($user->photo && Storage::disk('public')->exists($user->photo)) {
+                Storage::disk('public')->delete($user->photo);
+            }
+            
+            // Simpan foto baru
+            $path = $request->file('photo')->store('profile-photos', 'public');
+            $validated['photo'] = $path;
         }
-        $validated['photo'] = $request->file('photo')->store('profile-photos', 'public');
-    }
 
-    $user->update($validated);
+        $user->update($validated);
 
-    return back()->with('success', 'Profil berhasil diperbarui.');
+        return back()->with('success', 'Profil berhasil diperbarui.');
     }
 
     public function updatePassword(Request $request)
     {
         $request->validate([
             'current_password' => 'required',
-            'password' => 'required|min:6|confirmed',
+            'password'         => 'required|min:8|confirmed', // Min 8 karakter lebih aman
         ]);
 
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         if (!Hash::check($request->current_password, $user->password)) {
-            return back()->with('error', 'Password lama salah.');
+            return back()->withErrors(['current_password' => 'Password lama salah.']);
         }
 
         $user->update([
@@ -66,21 +68,20 @@ class userProfileController extends Controller
     }
 
     public function deletePhoto()
-{
-    $user = auth()->user();
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
 
-    // Cek jika user punya foto
-    if ($user->photo) {
-        // Hapus file fisik dari storage
-        Storage::disk('public')->delete($user->photo);
+        if ($user->photo) {
+            if (Storage::disk('public')->exists($user->photo)) {
+                Storage::disk('public')->delete($user->photo);
+            }
 
-        // Update database jadi null
-        $user->update(['photo' => null]);
+            $user->update(['photo' => null]);
 
-        return back()->with('success', 'Foto profil berhasil dihapus.');
+            return back()->with('success', 'Foto profil berhasil dihapus.');
+        }
+
+        return back()->with('error', 'Tidak ada foto untuk dihapus.');
     }
-
-    return back()->with('error', 'Tidak ada foto untuk dihapus.');
-}
-    
 }

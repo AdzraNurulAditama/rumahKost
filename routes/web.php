@@ -5,7 +5,8 @@ use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DisukaiController;
 use App\Http\Controllers\KelolaKostController;
-use App\Http\Controllers\userProfileController as ControllersUserProfileController;
+use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\userProfileController as Controller;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -62,6 +63,8 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::prefix('admin')->name('admin.')->group(function () {
+        // Halaman Dashboard Utama
+        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
         
         // Halaman Utama Tabel Kelola Kost
         Route::get('/kost', [KelolaKostController::class, 'index'])->name('kost.index');
@@ -80,6 +83,9 @@ Route::middleware('auth')->group(function () {
         
         // Hapus Data Kost
         Route::delete('/kost/{id}', [KelolaKostController::class, 'destroy'])->name('kost.destroy');
+
+    
+    
     });
 
     
