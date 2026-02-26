@@ -6,7 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DisukaiController;
 use App\Http\Controllers\KelolaKostController;
 use App\Http\Controllers\AdminDashboardController;
-use App\Http\Controllers\userProfileController as Controller;
+use App\Http\Controllers\PenyewaController; 
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -45,48 +45,67 @@ Route::post('/logout', [AuthController::class, 'logout'])
 
 Route::middleware('auth')->group(function () {
 
+    /*
+    |--------------------------------------------------------------------------
+    | USER AREA
+    |--------------------------------------------------------------------------
+    */
+
     // DASHBOARD USER
     Route::get('/dashboard', [HomeController::class, 'dashboard'])
         ->name('dashboard');
 
     // PROFILE
-    Route::get('/profile', [userProfileController::class, 'index'])->name('user.profile');
-    Route::post('/profile/update', [userProfileController::class, 'update'])->name('user.profile.update');
-    Route::post('/profile/password', [userProfileController::class, 'updatePassword'])->name('user.password.update');
-    
-    Route::get('/profile/disukai', [DisukaiController::class, 'index'])->name('user.disukai'); // disukai contrller
-    Route::get('/profile/voucher', [userProfileController::class, 'voucher'])->name('user.voucher');
+    Route::get('/profile', [UserProfileController::class, 'index'])->name('user.profile');
+    Route::post('/profile/update', [UserProfileController::class, 'update'])->name('user.profile.update');
+    Route::post('/profile/password', [UserProfileController::class, 'updatePassword'])->name('user.password.update');
+    Route::get('/profile/disukai', [DisukaiController::class, 'index'])->name('user.disukai');
+    Route::get('/profile/voucher', [UserProfileController::class, 'voucher'])->name('user.voucher');
     Route::delete('/profile/photo/delete', [UserProfileController::class, 'deletePhoto'])->name('user.profile.photo.delete');
+
+
     /*
     |--------------------------------------------------------------------------
-    | ADMIN AREA (KELOLA KOST) - SESUAI DESAIN DASHBOARD ADMIN
+    | ADMIN AREA
     |--------------------------------------------------------------------------
     */
-    Route::prefix('admin')->name('admin.')->group(function () {
-        // Halaman Dashboard Utama
-        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
-        
-        // Halaman Utama Tabel Kelola Kost
-        Route::get('/kost', [KelolaKostController::class, 'index'])->name('kost.index');
-        
-        // Form Tambah Kost Baru
-        Route::get('/kost/create', [KelolaKostController::class, 'create'])->name('kost.create');
-        
-        // Simpan Data Kost
-        Route::post('/kost', [KelolaKostController::class, 'store'])->name('kost.store');
-        
-        // Form Edit Kost
-        Route::get('/kost/{id}/edit', [KelolaKostController::class, 'edit'])->name('kost.edit');
-        
-        // Update Data Kost
-        Route::put('/kost/{id}', [KelolaKostController::class, 'update'])->name('kost.update');
-        
-        // Hapus Data Kost
-        Route::delete('/kost/{id}', [KelolaKostController::class, 'destroy'])->name('kost.destroy');
 
-    
-    
+    Route::prefix('admin')->name('admin.')->group(function () {
+
+        // Dashboard Admin
+        Route::get('/dashboard', [AdminDashboardController::class, 'index'])
+            ->name('dashboard');
+
+        // Kelola Kost
+        Route::get('/kost', [KelolaKostController::class, 'index'])
+            ->name('kost.index');
+
+        Route::get('/kost/create', [KelolaKostController::class, 'create'])
+            ->name('kost.create');
+
+        Route::post('/kost', [KelolaKostController::class, 'store'])
+            ->name('kost.store');
+
+        Route::get('/kost/{id}/edit', [KelolaKostController::class, 'edit'])
+            ->name('kost.edit');
+
+        Route::put('/kost/{id}', [KelolaKostController::class, 'update'])
+            ->name('kost.update');
+
+        Route::delete('/kost/{id}', [KelolaKostController::class, 'destroy'])
+            ->name('kost.destroy');
+
+
+        // KELOLA PENYEWA
+        Route::get('/penyewa', [PenyewaController::class, 'index'])
+        ->name('penyewa.index');
+
+    Route::post('/penyewa', [PenyewaController::class, 'store'])
+        ->name('penyewa.store');
+
+    Route::delete('/penyewa/{id}', [PenyewaController::class, 'destroy'])
+        ->name('penyewa.destroy');
+
     });
 
-    
 });
