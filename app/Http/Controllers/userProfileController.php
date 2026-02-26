@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
-class UserProfileController extends Controller // Nama class sebaiknya PascalCase
+class userProfileController extends Controller // Nama class sebaiknya PascalCase
 {
     public function index()
     {
