@@ -22,7 +22,7 @@
         <aside class="w-64 bg-white border-r border-gray-100 flex flex-col fixed h-full shadow-sm">
             <div class="p-8">
                 <a href="/" class="text-2xl font-bold text-[#0047FF]">
-                    Rumah<span class="text-[#FFB800]">Cewe</span>
+                    Rumah<span class="text-[#FFB800]">Kost</span>
                 </a>
             </div>
 

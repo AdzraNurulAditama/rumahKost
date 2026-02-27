@@ -13,19 +13,16 @@ return new class extends Migration
     {
         Schema::create('kosts', function (Blueprint $table) {
             $table->id();
-
             $table->string('nama');
             $table->text('alamat');
-            $table->string('lokasi'); // Karawang, Karawang Barat, dll
-
-            $table->integer('harga'); // harga per tahun
-
-            $table->string('gambar'); // path gambar
-
+            $table->string('lokasi');
+            $table->string('jenis'); // ✅ ini penting
+            $table->integer('harga');
+            $table->string('gambar');
+            $table->string('status');
+            $table->json('fasilitas');
             // 1 kolom fasilitas (JSON)
             // contoh isi: ["AC","WiFi","Lemari","Dapur","Parkir"]
-            $table->json('fasilitas');
-
             $table->timestamps();
         });
     }

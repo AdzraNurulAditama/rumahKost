@@ -21,4 +21,8 @@ class Kost extends Model
     protected $casts = [
         'fasilitas' => 'array'
     ];
+    public function images()
+{
+    return $this->hasMany(KostImage::class);
+}
 }

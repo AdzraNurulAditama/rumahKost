@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class KelolaKost extends Model
+class Kosts extends Model
 {
     protected $fillable = [
-        'nama', 'alamat', 'jenis', 'harga', 'fasilitas', 'gambar', 'status'
+        'nama', 'alamat', 'jenis', 'harga', 'fasilitas', 'lokasi', 'gambar', 'status'
     ];
 
     // Penting: Agar fasilitas otomatis terbaca sebagai array

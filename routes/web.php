@@ -3,11 +3,15 @@
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\AuthController;
+<<<<<<< HEAD
 use App\Http\Controllers\DisukaiController;
 use App\Http\Controllers\KelolaKostController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\PenyewaController; 
 use App\Http\Controllers\PencarianController;
+=======
+use App\Http\Controllers\KelolaKostController;
+>>>>>>> 7f4b859 (kelolakost)
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,6 +22,10 @@ use Illuminate\Support\Facades\Route;
 
 // HOME
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// DETAIL KOST (USER LIHAT DETAIL)
+Route::get('/kost/{id}', [HomeController::class, 'detail'])
+    ->name('kost.detail');
 
 // REGISTER
 Route::get('/register', function () {
@@ -69,8 +77,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile/photo/delete', [UserProfileController::class, 'deletePhoto'])->name('user.profile.photo.delete');
 
 
+
     /*
     |--------------------------------------------------------------------------
+<<<<<<< HEAD
     | ADMIN AREA
     |--------------------------------------------------------------------------
     */
@@ -112,5 +122,33 @@ Route::middleware('auth')->group(function () {
             ->name('penyewa.destroy');
 
     });
+=======
+    | ADMIN AREA (KELOLA KOST)
+    |--------------------------------------------------------------------------
+    */
+>>>>>>> 7f4b859 (kelolakost)
 
+   Route::prefix('admin')->name('admin.')->group(function () {
+
+    Route::get('/kost', [KelolaKostController::class, 'index'])
+        ->name('kost.index');
+
+    Route::get('/kost/create', [KelolaKostController::class, 'create'])
+        ->name('kost.create');
+
+    Route::post('/kost', [KelolaKostController::class, 'store'])
+        ->name('kost.store');
+
+    Route::get('/kost/{kost}/edit', [KelolaKostController::class, 'edit'])
+        ->name('kost.edit');
+
+    Route::put('/kost/{kost}', [KelolaKostController::class, 'update'])
+        ->name('kost.update');
+
+    Route::delete('/kost/{kost}', [KelolaKostController::class, 'destroy'])
+        ->name('kost.destroy');
+
+    Route::delete('/kost/image/{image}', [KelolaKostController::class, 'deleteImage'])
+        ->name('kost.image.delete');
+    });
 });

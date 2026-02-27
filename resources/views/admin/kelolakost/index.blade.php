@@ -8,7 +8,8 @@
             <option>Semua kost</option>
         </select>
     </div>
-    <a href="{{ route('admin.kost.create') }}" class="bg-[#0047FF] text-white px-6 py-2 rounded-lg font-bold text-sm shadow-md flex items-center gap-2">
+    <a href="{{ route('admin.kost.create') }}" 
+       class="bg-[#0047FF] text-white px-6 py-2 rounded-lg font-bold text-sm shadow-md flex items-center gap-2">
         <i class="fa fa-plus"></i> Tambah Kost
     </a>
 </div>
@@ -24,40 +25,73 @@
                 <th class="px-6 py-4 text-center">Aksi</th>
             </tr>
         </thead>
+
         <tbody class="divide-y">
-            @foreach($kosts as $kost)
+
+        @foreach($kosts as $kost)
             <tr>
-                <td class="px-6 py-4">
-                    <img src="{{ asset('storage/'.$kost->gambar) }}" class="w-32 h-20 object-cover rounded-xl">
-                </td>
+                {{-- FOTO --}}
+                @if($kost->images && $kost->images->isNotEmpty())
+                    <td class="px-6 py-4">
+                        <img src="{{ asset('images/kost/'.$kost->images->first()->image) }}" 
+                             class="w-32 h-20 object-cover rounded-xl">
+                    </td>
+                @else
+                    <td class="px-6 py-4">
+                        <div class="w-32 h-20 bg-gray-200 rounded-xl flex items-center justify-center text-xs text-gray-400">
+                            No Image
+                        </div>
+                    </td>
+                @endif
+
+                {{-- NAMA --}}
                 <td class="px-6 py-4">
                     <h3 class="font-bold text-gray-800">{{ $kost->nama }}</h3>
-                    <p class="text-[10px] text-gray-400 leading-tight max-w-xs">{{ $kost->alamat }}</p>
+                    <p class="text-[10px] text-gray-400 leading-tight max-w-xs">
+                        {{ $kost->alamat }}
+                    </p>
                 </td>
+
+                {{-- JENIS --}}
                 <td class="px-6 py-4 text-center text-sm text-gray-600">
                     {{ $kost->jenis ?? 'Putra' }}
                 </td>
+
+                {{-- STATUS --}}
                 <td class="px-6 py-4 text-center">
                     <span class="bg-[#27AE60] text-white px-4 py-1 rounded-full text-xs font-bold">
                         Aktif
                     </span>
                 </td>
+
+                {{-- AKSI --}}
                 <td class="px-6 py-4 text-center">
-                    <a href="#" class="bg-[#0047FF] text-white px-6 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-2 inline-flex">
-                        <i class="fa fa-edit"></i> Edit
-                    </a>
+                    <div class="flex justify-center gap-2">
+
+                        {{-- EDIT --}}
+                        <a href="{{ route('admin.kost.edit', $kost->id) }}" 
+                           class="bg-[#0047FF] text-white px-4 py-1.5 rounded-lg text-xs font-bold inline-flex items-center gap-1">
+                            <i class="fa fa-edit"></i> Edit
+                        </a>
+
+                        {{-- DELETE --}}
+                        <form action="{{ route('admin.kost.destroy', $kost->id) }}" 
+                              method="POST"
+                              onsubmit="return confirm('Yakin mau hapus kost ini?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit"
+                                class="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold inline-flex items-center gap-1">
+                                <i class="fa fa-trash"></i> Hapus
+                            </button>
+                        </form>
+
+                    </div>
                 </td>
             </tr>
-            @endforeach
+        @endforeach
+
         </tbody>
     </table>
-</div>
-
-<div class="flex justify-center gap-2 mt-8">
-    <button class="w-8 h-8 bg-blue-600 text-white rounded flex items-center justify-center"><i class="fa fa-chevron-left text-xs"></i></button>
-    <button class="w-8 h-8 bg-orange-400 text-white rounded font-bold">1</button>
-    <button class="w-8 h-8 bg-gray-300 text-white rounded font-bold">2</button>
-    <button class="w-8 h-8 bg-gray-300 text-white rounded font-bold">3</button>
-    <button class="w-8 h-8 bg-blue-600 text-white rounded flex items-center justify-center"><i class="fa fa-chevron-right text-xs"></i></button>
 </div>
 @endsection
