@@ -7,6 +7,7 @@ use App\Http\Controllers\DisukaiController;
 use App\Http\Controllers\KelolaKostController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\PenyewaController; 
+use App\Http\Controllers\PencarianController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -55,6 +56,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [HomeController::class, 'dashboard'])
         ->name('dashboard');
 
+    // PENCARIAN KOS (USER)  
+   Route::get('/pencarian', [PencarianController::class, 'index'])
+    ->name('pencarian');
+
     // PROFILE
     Route::get('/profile', [UserProfileController::class, 'index'])->name('user.profile');
     Route::post('/profile/update', [UserProfileController::class, 'update'])->name('user.profile.update');
@@ -98,13 +103,13 @@ Route::middleware('auth')->group(function () {
 
         // KELOLA PENYEWA
         Route::get('/penyewa', [PenyewaController::class, 'index'])
-        ->name('penyewa.index');
+            ->name('penyewa.index');
 
-    Route::post('/penyewa', [PenyewaController::class, 'store'])
-        ->name('penyewa.store');
+        Route::post('/penyewa', [PenyewaController::class, 'store'])
+            ->name('penyewa.store');
 
-    Route::delete('/penyewa/{id}', [PenyewaController::class, 'destroy'])
-        ->name('penyewa.destroy');
+        Route::delete('/penyewa/{id}', [PenyewaController::class, 'destroy'])
+            ->name('penyewa.destroy');
 
     });
 
