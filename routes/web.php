@@ -3,15 +3,11 @@
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\AuthController;
-<<<<<<< HEAD
 use App\Http\Controllers\DisukaiController;
 use App\Http\Controllers\KelolaKostController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\PenyewaController; 
 use App\Http\Controllers\PencarianController;
-=======
-use App\Http\Controllers\KelolaKostController;
->>>>>>> 7f4b859 (kelolakost)
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -80,7 +76,6 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-<<<<<<< HEAD
     | ADMIN AREA
     |--------------------------------------------------------------------------
     */
@@ -122,11 +117,6 @@ Route::middleware('auth')->group(function () {
             ->name('penyewa.destroy');
 
     });
-=======
-    | ADMIN AREA (KELOLA KOST)
-    |--------------------------------------------------------------------------
-    */
->>>>>>> 7f4b859 (kelolakost)
 
    Route::prefix('admin')->name('admin.')->group(function () {
 
