@@ -10,8 +10,6 @@ class KelolaKostController extends Controller
 {
     public function index()
     {
-        $kosts = Kost::latest()->paginate(3); // Paginate 3 sesuai jumlah di gambar kamu
-        return view('admin.kelolakost.index', compact('kosts'));
         $kosts = Kost::with('images')->latest()->paginate(3);
         return view('admin.kelolakost.index', compact('kosts'));
     }
@@ -67,44 +65,41 @@ class KelolaKostController extends Controller
         return view('admin.kelolakost.edit', compact('kost'));
     }
 
-    public function update(Request $request, Kost $kost)
-    {
-        $request->validate([
-            'nama' => 'required',
-            'harga' => 'required|numeric',
-            'lokasi' => 'required',
-            'alamat' => 'required',
-            'fasilitas' => 'required|array',
-            'gambar.*' => 'image|mimes:jpeg,png,jpg|max:2048'
-        ]);
+public function update(Request $request, Kost $kost)
+{
+    $request->validate([
+        'nama' => 'required',
+        'harga' => 'required|numeric',
+        'lokasi' => 'required',
+        'alamat' => 'required',
+        'gambar.*' => 'image|mimes:jpeg,png,jpg|max:2048'
+    ]);
 
-        // Update data utama
-        $kost->update([
-            'nama' => $request->nama,
-            'harga' => $request->harga,
-            'lokasi' => $request->lokasi,
-            'alamat' => $request->alamat,
-            'jenis' => 'Putri', // hardcode
-            'fasilitas' => json_encode($request->fasilitas),
-            'status' => 'Aktif' // hardcode
-        ]);
+    $kost->update([
+        'nama' => $request->nama,
+        'harga' => $request->harga,
+        'lokasi' => $request->lokasi,
+        'alamat' => $request->alamat,
+        'jenis' => 'Putri',
+        'status' => 'Aktif'
+    ]);
 
-        // Tambah foto baru jika ada
-        if ($request->hasFile('gambar')) {
-            foreach ($request->file('gambar') as $file) {
+    // SIMPAN GAMBAR BARU JIKA ADA
+    if ($request->hasFile('gambar')) {
+        foreach ($request->file('gambar') as $file) {
 
-                $filename = uniqid() . '_' . $file->getClientOriginalName();
-                $file->move(public_path('images/kost'), $filename);
+            $filename = uniqid() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('images/kost'), $filename);
 
-                $kost->images()->create([
-                    'image' => $filename
-                ]);
-            }
+            $kost->images()->create([
+                'image' => $filename
+            ]);
         }
-
-        return redirect()->route('admin.kost.index')
-            ->with('success', 'Kost berhasil diupdate!');
     }
+
+    return redirect()->route('admin.kost.index')
+        ->with('success', 'Kost berhasil diupdate!');
+}
 
     public function destroy(Kost $kost)
     {

@@ -10,4 +10,8 @@ class KostImage extends Model
         'kost_id',
         'image'
     ];
+    public function kost()
+    {
+        return $this->belongsTo(Kost::class, 'kost_id');
+    }
 }

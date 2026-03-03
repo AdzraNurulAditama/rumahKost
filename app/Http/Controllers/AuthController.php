@@ -63,9 +63,8 @@ class AuthController extends Controller
 
             // Regenerate session (WAJIB untuk security)
             $request->session()->regenerate();
-
-            return redirect()->route('dashboard');
-        }
+            return redirect()->route('admin.dashboard');
+            }
 
         return back()->with('error', 'Email atau password salah');
     }

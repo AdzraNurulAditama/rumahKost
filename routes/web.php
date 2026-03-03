@@ -44,81 +44,39 @@ Route::post('/logout', [AuthController::class, 'logout'])
 
 /*
 |--------------------------------------------------------------------------
-| PROTECTED (WAJIB LOGIN)
+| USER (WAJIB LOGIN)
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('auth')->group(function () {
+Route::prefix('user')->name('user.')->middleware('auth')->group(function () {
 
-    /*
-    |--------------------------------------------------------------------------
-    | USER AREA
-    |--------------------------------------------------------------------------
-    */
-
-    // DASHBOARD USER
-    Route::get('/dashboard', [HomeController::class, 'dashboard'])
-        ->name('dashboard');
-
-    // PENCARIAN KOS (USER)  
-   Route::get('/pencarian', [PencarianController::class, 'index'])
-    ->name('pencarian');
+    // FAVORIT
+    Route::get('/disukai', [DisukaiController::class, 'index'])
+        ->name('disukai');
 
     // PROFILE
-    Route::get('/profile', [UserProfileController::class, 'index'])->name('user.profile');
-    Route::post('/profile/update', [UserProfileController::class, 'update'])->name('user.profile.update');
-    Route::post('/profile/password', [UserProfileController::class, 'updatePassword'])->name('user.password.update');
-    Route::get('/profile/disukai', [DisukaiController::class, 'index'])->name('user.disukai');
-    Route::get('/profile/voucher', [UserProfileController::class, 'voucher'])->name('user.voucher');
-    Route::delete('/profile/photo/delete', [UserProfileController::class, 'deletePhoto'])->name('user.profile.photo.delete');
+    Route::get('/profile', [UserProfileController::class, 'index'])
+        ->name('profile');
+});
 
 
+/*
+|--------------------------------------------------------------------------
+| PROTECTED (ADMIN)
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('admin')->name('admin.')->group(function () {
+
+    // Dashboard Admin
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])
+        ->name('dashboard');
 
     /*
-    |--------------------------------------------------------------------------
-    | ADMIN AREA
-    |--------------------------------------------------------------------------
+    |------------------------------------------------------------------
+    | KELOLA KOST
+    |------------------------------------------------------------------
     */
-
-    Route::prefix('admin')->name('admin.')->group(function () {
-
-        // Dashboard Admin
-        Route::get('/dashboard', [AdminDashboardController::class, 'index'])
-            ->name('dashboard');
-
-        // Kelola Kost
-        Route::get('/kost', [KelolaKostController::class, 'index'])
-            ->name('kost.index');
-
-        Route::get('/kost/create', [KelolaKostController::class, 'create'])
-            ->name('kost.create');
-
-        Route::post('/kost', [KelolaKostController::class, 'store'])
-            ->name('kost.store');
-
-        Route::get('/kost/{id}/edit', [KelolaKostController::class, 'edit'])
-            ->name('kost.edit');
-
-        Route::put('/kost/{id}', [KelolaKostController::class, 'update'])
-            ->name('kost.update');
-
-        Route::delete('/kost/{id}', [KelolaKostController::class, 'destroy'])
-            ->name('kost.destroy');
-
-
-        // KELOLA PENYEWA
-        Route::get('/penyewa', [PenyewaController::class, 'index'])
-            ->name('penyewa.index');
-
-        Route::post('/penyewa', [PenyewaController::class, 'store'])
-            ->name('penyewa.store');
-
-        Route::delete('/penyewa/{id}', [PenyewaController::class, 'destroy'])
-            ->name('penyewa.destroy');
-
-    });
-
-   Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::get('/kost', [KelolaKostController::class, 'index'])
         ->name('kost.index');
@@ -140,5 +98,20 @@ Route::middleware('auth')->group(function () {
 
     Route::delete('/kost/image/{image}', [KelolaKostController::class, 'deleteImage'])
         ->name('kost.image.delete');
-    });
+
+
+    /*
+    |------------------------------------------------------------------
+    | KELOLA PENYEWA
+    |------------------------------------------------------------------
+    */
+
+    Route::get('/penyewa', [PenyewaController::class, 'index'])
+        ->name('penyewa.index');
+
+    Route::post('/penyewa', [PenyewaController::class, 'store'])
+        ->name('penyewa.store');
+
+    Route::delete('/penyewa/{id}', [PenyewaController::class, 'destroy'])
+        ->name('penyewa.destroy');
 });

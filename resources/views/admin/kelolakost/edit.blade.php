@@ -3,6 +3,15 @@
 @section('content')
 <div class="max-w-4xl mx-auto">
 
+    {{-- ERROR VALIDATION --}}
+    @if ($errors->any())
+        <div class="bg-red-100 text-red-600 p-4 mb-6 rounded">
+            @foreach ($errors->all() as $error)
+                <p>{{ $error }}</p>
+            @endforeach
+        </div>
+    @endif
+
     <div class="flex justify-between items-center mb-8">
         <h1 class="text-2xl font-bold">
             Edit <span class="text-[#0047FF]">Kost</span>
@@ -15,7 +24,7 @@
 
     <div class="bg-white rounded-[40px] shadow-sm border p-10">
 
-        <form action="{{ route('admin.kost.update', $kost->id) }}" 
+        <form action="{{ route('admin.kost.update', $kost) }}" 
               method="POST" 
               enctype="multipart/form-data"
               class="space-y-8">
@@ -26,7 +35,7 @@
             <div>
                 <label class="block font-bold mb-2">Nama Kost</label>
                 <input type="text" name="nama" 
-                       value="{{ $kost->nama }}"
+                       value="{{ old('nama', $kost->nama) }}"
                        class="w-full px-5 py-3 rounded-2xl border">
             </div>
 
@@ -34,7 +43,7 @@
             <div>
                 <label class="block font-bold mb-2">Harga</label>
                 <input type="number" name="harga" 
-                       value="{{ $kost->harga }}"
+                       value="{{ old('harga', $kost->harga) }}"
                        class="w-full px-5 py-3 rounded-2xl border">
             </div>
 
@@ -42,7 +51,7 @@
             <div>
                 <label class="block font-bold mb-2">Lokasi</label>
                 <input type="text" name="lokasi" 
-                       value="{{ $kost->lokasi }}"
+                       value="{{ old('lokasi', $kost->lokasi) }}"
                        class="w-full px-5 py-3 rounded-2xl border">
             </div>
 
@@ -50,7 +59,7 @@
             <div>
                 <label class="block font-bold mb-2">Alamat</label>
                 <textarea name="alamat"
-                    class="w-full px-5 py-3 rounded-2xl border">{{ $kost->alamat }}</textarea>
+                    class="w-full px-5 py-3 rounded-2xl border">{{ old('alamat', $kost->alamat) }}</textarea>
             </div>
 
             {{-- Jenis --}}
@@ -71,14 +80,18 @@
                             <img src="{{ asset('images/kost/' . $img->image) }}"
                                  class="rounded-xl h-32 w-full object-cover">
 
-                            <form action="{{ route('admin.kost.image.delete', $img->id) }}"
+                            <a href="{{ route('admin.kost.image.delete', $img->id) }}"
+                               onclick="event.preventDefault(); document.getElementById('delete-image-{{ $img->id }}').submit();"
+                               class="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 text-xs rounded">
+                                Hapus
+                            </a>
+
+                            <form id="delete-image-{{ $img->id }}"
+                                  action="{{ route('admin.kost.image.delete', $img->id) }}"
                                   method="POST"
-                                  class="absolute top-2 right-2">
+                                  class="hidden">
                                 @csrf
                                 @method('DELETE')
-                                <button class="bg-red-500 text-white px-2 py-1 text-xs rounded">
-                                    Hapus
-                                </button>
                             </form>
                         </div>
                     @endforeach

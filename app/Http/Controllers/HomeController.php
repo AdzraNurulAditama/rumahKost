@@ -9,28 +9,34 @@ class HomeController extends Controller
 {
     public function dashboard()
 {
-    $kosts = Kost::latest()->get();
+    $kosts = Kost::with('images')->latest()->get();
+    return view('user.home', compact('kosts'));
+}
+
+public function index(Request $request)
+{
+    $query = Kost::with('images');
+
+    if ($request->lokasi) {
+        $query->where('lokasi', 'like', '%' . $request->lokasi . '%');
+    }
+
+    if ($request->harga) {
+        $query->where('harga', '<=', $request->harga);
+    }
+
+    if ($request->fasilitas) {
+        $query->whereJsonContains('fasilitas', $request->fasilitas);
+    }
+
+    $kosts = $query->latest()->get();
 
     return view('user.home', compact('kosts'));
 }
-    public function index(Request $request)
-    {
-        $query = Kost::query();
+public function detail($id)
+{
+    $kost = Kost::findOrFail($id);
 
-        if ($request->lokasi) {
-            $query->where('lokasi', 'like', '%' . $request->lokasi . '%');
-        }
-
-        if ($request->harga) {
-            $query->where('harga', '<=', $request->harga);
-        }
-
-        if ($request->fasilitas) {
-            $query->whereJsonContains('fasilitas', $request->fasilitas);
-        }
-
-        $kosts = $query->get();
-
-        return view('user.home', compact('kosts'));
-    }
+    return view('user.detail', compact('kost'));
+}
 }

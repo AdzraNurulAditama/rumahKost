@@ -9,8 +9,6 @@ class Kosts extends Model
     protected $fillable = [
         'nama', 'alamat', 'jenis', 'harga', 'fasilitas', 'lokasi', 'gambar', 'status'
     ];
-
-    // Penting: Agar fasilitas otomatis terbaca sebagai array
     protected $casts = [
         'fasilitas' => 'array'
     ];
