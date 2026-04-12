@@ -2,27 +2,38 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Penyewa extends Model
 {
-    use HasFactory;
-
     protected $table = 'penyewas';
 
     protected $fillable = [
-        'nama_lengkap',
-        'email',
-        'nomor_telepon',
-        'no_kamar',
-        'nama_kost',
+        'user_id',
+        'kost_id',
+        'kamar_id', // ✅ TAMBAH
+        'jumlah_orang',
+        'tgl_masuk',
         'status',
-        'foto'
     ];
 
-    protected $casts = [
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-    ];
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function kost()
+    {
+        return $this->belongsTo(Kost::class);
+    }
+
+    public function kamar() // ✅ TAMBAH
+    {
+        return $this->belongsTo(Kamar::class);
+    }
+
+    public function pembayarans()
+    {
+        return $this->hasMany(Pembayaran::class);
+    }
 }

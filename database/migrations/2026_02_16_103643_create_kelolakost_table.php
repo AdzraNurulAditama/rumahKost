@@ -15,11 +15,10 @@ return new class extends Migration
         $table->id();
         $table->string('nama');
         $table->string('alamat');
-        $table->string('jenis')->default('Putra'); // Sesuai kolom "Jenis" di gambar
+        $table->string('jenis')->default('Putra');
         $table->integer('harga');
-        $table->json('fasilitas'); // Untuk menyimpan banyak fasilitas sekaligus
-        $table->string('gambar');
-        $table->string('status')->default('Aktif'); // Sesuai kolom "Status" di gambar
+        $table->json('fasilitas');
+        $table->string('status')->default('Aktif');
         $table->timestamps();
     });
 }

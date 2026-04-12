@@ -1,252 +1,188 @@
 @extends('admin.layouts.admin')
 
 @section('content')
-<div class="flex justify-between items-end mb-6">
-    <div>
-        <h1 class="text-2xl font-bold mb-4">Daftar Penghuni</h1>
-    </div>
 
-    <button onclick="openModal()" 
-        class="bg-[#0047FF] text-white px-6 py-2 rounded-lg font-bold text-sm shadow-md flex items-center gap-2">
-        <i class="fa fa-plus"></i> Tambah User
-    </button>
+<div class="flex justify-between items-center mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-800">Daftar Penyewa</h1>
+        <p class="text-sm text-gray-500">Kelola pengajuan penyewa kost</p>
+    </div>
 </div>
 
-<div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+
     <table class="w-full text-left">
-        <thead class="border-b bg-gray-50">
-            <tr class="text-gray-500 text-sm font-semibold">
-                <th class="px-6 py-4">Nama Lengkap</th>
-                <th class="px-6 py-4 text-center">No. Kamar</th>
+        <thead class="bg-blue-50 border-b text-sm text-gray-600 font-semibold">
+            <tr>
+                <th class="px-6 py-4">Nama Penyewa</th>
                 <th class="px-6 py-4 text-center">Kost</th>
-                <th class="px-6 py-4 text-center">Status Sewa</th>
+                <th class="px-6 py-4 text-center">Jumlah Orang</th>
+                <th class="px-6 py-4 text-center">Tanggal Masuk</th>
+                <th class="px-6 py-4 text-center">Status</th>
                 <th class="px-6 py-4 text-center">Aksi</th>
             </tr>
         </thead>
+
         <tbody class="divide-y">
-            @foreach($penyewas as $penyewa)
-            <tr>
-                <td class="px-6 py-4 flex items-center gap-4">
+            @forelse($penyewas as $penyewa)
+                <tr class="hover:bg-blue-50 transition">
 
-                    {{-- FOTO --}}
-                    @if($penyewa->foto)
-                        <img src="{{ asset('storage/'.$penyewa->foto) }}" 
-                             class="w-10 h-10 rounded-full object-cover">
-                    @else
-                        <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-xs">
-                            No Img
-                        </div>
-                    @endif
+                    {{-- USER --}}
+                    <td class="px-6 py-4 flex items-center gap-4">
+                        @if($penyewa->user->photo ?? false)
+                            <img src="{{ asset('storage/'.$penyewa->user->photo) }}"
+                                class="w-10 h-10 rounded-full object-cover">
+                        @else
+                            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-xs font-bold text-blue-600">
+                                {{ strtoupper(substr($penyewa->user->username ?? 'U',0,1)) }}
+                            </div>
+                        @endif
 
-                    <span class="font-bold text-gray-800">
-                        {{ $penyewa->nama_lengkap }}
-                    </span>
-                </td>
-
-                <td class="px-6 py-4 text-center text-sm text-gray-600">
-                    {{ $penyewa->no_kamar }}
-                </td>
-
-                <td class="px-6 py-4 text-center text-sm text-gray-600">
-                    {{ $penyewa->nama_kost }}
-                </td>
-
-                <td class="px-6 py-4 text-center">
-                    @if($penyewa->status == 'Aktif')
-                        <span class="bg-[#27AE60] text-white px-4 py-1 rounded-full text-xs font-bold">
-                            Aktif
+                        <span class="font-semibold text-gray-800">
+                            {{ $penyewa->user->username ?? $penyewa->user->name ?? 'User Tidak Ada' }}
                         </span>
-                    @else
-                        <span class="bg-red-500 text-white px-4 py-1 rounded-full text-xs font-bold">
-                            Tidak Aktif
-                        </span>
-                    @endif
-                </td>
+                    </td>
 
-                <td class="px-6 py-4 text-center flex justify-center gap-3">
+                    {{-- KOST --}}
+                    <td class="px-6 py-4 text-center text-gray-600 text-sm">
+                        {{ $penyewa->kost->nama ?? '-' }}
+                    </td>
 
-                    {{-- EDIT --}}
-                    <button onclick='openEditModal(@json($penyewa))'
-                        class="text-blue-500 hover:text-blue-700">
-                        <i class="fa fa-edit"></i>
-                    </button>
+                    {{-- JUMLAH --}}
+                    <td class="px-6 py-4 text-center text-gray-600 text-sm">
+                        {{ $penyewa->jumlah_orang }}
+                    </td>
+
+                    {{-- TANGGAL --}}
+                    <td class="px-6 py-4 text-center text-gray-600 text-sm">
+                        {{ \Carbon\Carbon::parse($penyewa->tgl_masuk)->format('d M Y') }}
+                    </td>
+
+                    {{-- STATUS --}}
+                    <td class="px-6 py-4 text-center">
+                        <form action="{{ route('admin.penyewa.update', $penyewa->id) }}" method="POST">
+                            @csrf
+                            @method('PUT')
+
+                            <select name="status"
+                                onchange="this.form.submit()"
+                                class="px-2 py-2 rounded-full text-sm font-semibold border shadow-sm cursor-pointer
+                                @if($penyewa->status == 'menunggu')
+                                    bg-yellow-100 text-yellow-700 border-yellow-300
+                                @elseif($penyewa->status == 'disetujui')
+                                    bg-green-100 text-green-700 border-green-300
+                                @elseif($penyewa->status == 'ditolak')
+                                    bg-red-100 text-red-700 border-red-300
+                                @endif">
+
+                                <option value="menunggu" {{ $penyewa->status == 'menunggu' ? 'selected' : '' }}>
+                                    Menunggu
+                                </option>
+
+                                <option value="disetujui" {{ $penyewa->status == 'disetujui' ? 'selected' : '' }}>
+                                    Disetujui
+                                </option>
+
+                                <option value="ditolak" {{ $penyewa->status == 'ditolak' ? 'selected' : '' }}>
+                                    Ditolak
+                                </option>
+                            </select>
+                        </form>
+                    </td>
 
                     {{-- DELETE --}}
-                    <form action="{{ route('admin.penyewa.destroy', $penyewa->id) }}" 
-                          method="POST"
-                          onsubmit="return confirm('Yakin ingin menghapus?')">
-                        @csrf
-                        @method('DELETE')
-                        <button class="text-red-500 hover:text-red-700">
-                            <i class="fa fa-trash"></i>
-                        </button>
-                    </form>
-                </td>
-            </tr>
-            @endforeach
+                    <td class="px-6 py-4 text-center">
+                        <form action="{{ route('admin.penyewa.destroy', $penyewa->id) }}" method="POST"
+                            onsubmit="return confirm('Yakin ingin menghapus penyewa ini?')">
+
+                            @csrf
+                            @method('DELETE')
+
+                            <button class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-sm">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="6" class="text-center py-12 text-gray-400">
+                        Belum ada pengajuan penyewa
+                    </td>
+                </tr>
+            @endforelse
         </tbody>
     </table>
-</div>
 
-<!-- ================= MODAL TAMBAH ================= -->
-<div id="modalTambah" 
-     class="fixed inset-0 bg-black/40 hidden justify-center items-center z-50">
+    {{-- PAGINATION --}}
+    <div class="p-6 border-t bg-gray-50 flex justify-center">
+        @if ($penyewas->hasPages())
+            <nav class="flex items-center gap-2">
 
-    <div class="bg-white w-[450px] rounded-2xl shadow-lg p-6">
+                {{-- PREVIOUS --}}
+                @if ($penyewas->onFirstPage())
+                    <span class="px-3 py-2 rounded-lg bg-gray-200 text-gray-400 text-sm">‹</span>
+                @else
+                    <a href="{{ $penyewas->previousPageUrl() }}"
+                        class="px-3 py-2 rounded-lg bg-yellow-100 text-blue-700 hover:bg-yellow-200 text-sm">
+                        ‹
+                    </a>
+                @endif
 
-        <h3 class="text-lg font-bold mb-5">Tambah Penyewa</h3>
+                {{-- PAGES --}}
+                @foreach ($penyewas->getUrlRange(1, $penyewas->lastPage()) as $page => $url)
+                    @if ($page == $penyewas->currentPage())
+                        <span class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-bold">
+                            {{ $page }}
+                        </span>
+                    @else
+                        <a href="{{ $url }}"
+                            class="px-4 py-2 rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 text-sm">
+                            {{ $page }}
+                        </a>
+                    @endif
+                @endforeach
 
-        <form action="{{ route('admin.penyewa.store') }}" 
-              method="POST" 
-              enctype="multipart/form-data">
-            @csrf
+                {{-- NEXT --}}
+                @if ($penyewas->hasMorePages())
+                    <a href="{{ $penyewas->nextPageUrl() }}"
+                        class="px-3 py-2 rounded-lg bg-yellow-100 text-blue-700 hover:bg-yellow-200 text-sm">
+                        ›
+                    </a>
+                @else
+                    <span class="px-3 py-2 rounded-lg bg-gray-200 text-gray-400 text-sm">›</span>
+                @endif
 
-            <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1">Nama</label>
-                <input type="text" name="nama" required class="w-full border rounded-lg px-3 py-2">
-            </div>
-
-            <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1">Email</label>
-                <input type="email" name="email" required class="w-full border rounded-lg px-3 py-2">
-            </div>
-
-            <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1">No Telepon</label>
-                <input type="text" name="nomor_telepon" class="w-full border rounded-lg px-3 py-2">
-            </div>
-
-            <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1">No Kamar</label>
-                <input type="text" name="no_kamar" required class="w-full border rounded-lg px-3 py-2">
-            </div>
-
-            <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1">Nama Kost</label>
-                <input type="text" name="nama_kost" required class="w-full border rounded-lg px-3 py-2">
-            </div>
-
-            <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1">Foto</label>
-                <input type="file" name="foto" class="w-full border rounded-lg px-3 py-2">
-            </div>
-
-            <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1">Status</label>
-                <select name="status" class="w-full border rounded-lg px-3 py-2">
-                    <option value="Aktif">Aktif</option>
-                    <option value="Tidak Aktif">Tidak Aktif</option>
-                </select>
-            </div>
-
-            <div class="flex justify-end gap-3 mt-6">
-                <button type="button" onclick="closeModal()"
-                    class="bg-gray-400 text-white px-4 py-2 rounded-lg text-sm">
-                    Batal
-                </button>
-
-                <button type="submit"
-                    class="bg-[#0047FF] text-white px-4 py-2 rounded-lg text-sm font-bold">
-                    Simpan
-                </button>
-            </div>
-        </form>
+            </nav>
+        @endif
     </div>
+
 </div>
 
-<!-- ================= MODAL EDIT ================= -->
-<div id="modalEdit" 
-     class="fixed inset-0 bg-black/40 hidden justify-center items-center z-50">
 
-    <div class="bg-white w-[450px] rounded-2xl shadow-lg p-6">
+{{-- <script>
 
-        <h3 class="text-lg font-bold mb-5">Edit Penyewa</h3>
-
-        <form id="formEdit" method="POST" enctype="multipart/form-data">
-            @csrf
-            @method('PUT')
-
-            <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1">Nama</label>
-                <input type="text" name="nama" id="edit_nama" required class="w-full border rounded-lg px-3 py-2">
-            </div>
-
-            <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1">Email</label>
-                <input type="email" name="email" id="edit_email" required class="w-full border rounded-lg px-3 py-2">
-            </div>
-
-            <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1">No Telepon</label>
-                <input type="text" name="nomor_telepon" id="edit_nomor_telepon" class="w-full border rounded-lg px-3 py-2">
-            </div>
-
-            <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1">No Kamar</label>
-                <input type="text" name="no_kamar" id="edit_no_kamar" required class="w-full border rounded-lg px-3 py-2">
-            </div>
-
-            <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1">Nama Kost</label>
-                <input type="text" name="nama_kost" id="edit_nama_kost" required class="w-full border rounded-lg px-3 py-2">
-            </div>
-
-            <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1">Foto</label>
-                <input type="file" name="foto" class="w-full border rounded-lg px-3 py-2">
-                <small class="text-gray-500">Kosongkan jika tidak diganti</small>
-            </div>
-
-            <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1">Status</label>
-                <select name="status" id="edit_status" class="w-full border rounded-lg px-3 py-2">
-                    <option value="Aktif">Aktif</option>
-                    <option value="Tidak Aktif">Tidak Aktif</option>
-                </select>
-            </div>
-
-            <div class="flex justify-end gap-3 mt-6">
-                <button type="button" onclick="closeEditModal()"
-                    class="bg-gray-400 text-white px-4 py-2 rounded-lg text-sm">
-                    Batal
-                </button>
-
-                <button type="submit"
-                    class="bg-[#0047FF] text-white px-4 py-2 rounded-lg text-sm font-bold">
-                    Update
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<script>
-function openModal() {
-    document.getElementById('modalTambah').classList.remove('hidden');
-    document.getElementById('modalTambah').classList.add('flex');
+document.getElementById('checkAll').onclick = function() {
+let checkboxes = document.querySelectorAll('.checkbox-item');
+checkboxes.forEach(cb => cb.checked = this.checked);
 }
 
-function closeModal() {
-    document.getElementById('modalTambah').classList.add('hidden');
+function submitDelete(){
+
+let checked = document.querySelectorAll('.checkbox-item:checked');
+
+if(checked.length === 0){
+alert('Pilih minimal 1 penyewa');
+return;
 }
 
-function openEditModal(data) {
-    document.getElementById('modalEdit').classList.remove('hidden');
-    document.getElementById('modalEdit').classList.add('flex');
-
-    document.getElementById('edit_nama').value = data.nama_lengkap;
-    document.getElementById('edit_email').value = data.email;
-    document.getElementById('edit_nomor_telepon').value = data.nomor_telepon;
-    document.getElementById('edit_no_kamar').value = data.no_kamar;
-    document.getElementById('edit_nama_kost').value = data.nama_kost;
-    document.getElementById('edit_status').value = data.status;
-
-    document.getElementById('formEdit').action = `/admin/penyewa/${data.id}`;
+if(confirm('Hapus penyewa yang dipilih?')){
+document.getElementById('deleteForm').submit();
 }
 
-function closeEditModal() {
-    document.getElementById('modalEdit').classList.add('hidden');
 }
-</script>
+
+</script> --}}
 
 @endsection

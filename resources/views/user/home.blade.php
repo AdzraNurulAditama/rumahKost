@@ -11,10 +11,7 @@
             {{-- Wrapper untuk Judul Luar & Card --}}
             <div class="flex flex-col">
                 
-                {{-- Judul Besar di Atas Card --}}
-                <h1 class="text-2xl font-bold text-gray-900 mb-4 ml-1">
-                    {{ $kost->nama }}
-                </h1>
+             
 
                 {{-- Card Kost --}}
                 <a href="{{ route('kost.detail', $kost->id) }}" class="block">

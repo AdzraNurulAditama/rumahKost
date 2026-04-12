@@ -9,6 +9,7 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
+
     // ======================
     // FORM LOGIN
     // ======================
@@ -17,57 +18,71 @@ class AuthController extends Controller
         return view('user.auth.login');
     }
 
+
     // ======================
     // PROSES REGISTER
     // ======================
     public function register(Request $request)
     {
         $request->validate([
-            'username' => 'required|string|max:255|unique:users',
-            'email' => 'required|string|email|max:255|unique:users',
+            'username' => 'required|string|max:255|unique:users,username',
+            'email' => 'required|email|max:255|unique:users,email',
             'nomor_telepon' => 'required|string|max:20',
-            'jenis_kelamin' => 'required',
-            'status' => 'required',
+            'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
+            'status' => 'required|string|max:50',
             'password' => 'required|string|min:8|confirmed',
         ]);
 
         $user = User::create([
-            'username' => $request->username,
-            'email' => $request->email,
-            'nomor_telepon' => $request->nomor_telepon,
-            'jenis_kelamin' => $request->jenis_kelamin,
-            'status' => $request->status,
-            'password' => Hash::make($request->password),
+            'username'       => $request->username,
+            'email'          => $request->email,
+            'nomor_telepon'  => $request->nomor_telepon,
+            'jenis_kelamin'  => $request->jenis_kelamin,
+            'status'         => $request->status,
+            'password'       => Hash::make($request->password),
         ]);
 
-        // Login otomatis setelah register
+        // login otomatis
         Auth::login($user);
 
-        // Regenerate session (security)
+        // regenerate session
         $request->session()->regenerate();
 
-        return redirect()->route('dashboard');
+        return redirect()->route('home')
+            ->with('success','Registrasi berhasil!');
     }
+
 
     // ======================
     // PROSES LOGIN
     // ======================
     public function login(Request $request)
     {
-        $request->validate([
+
+        $credentials = $request->validate([
             'email' => 'required|email',
-            'password' => 'required',
+            'password' => 'required'
         ]);
 
-        if (Auth::attempt($request->only('email', 'password'))) {
+        if (Auth::attempt($credentials)) {
 
-            // Regenerate session (WAJIB untuk security)
             $request->session()->regenerate();
-            return redirect()->route('admin.dashboard');
+
+            $user = Auth::user();
+
+            // redirect berdasarkan role
+            if ($user->role === 'admin') {
+                return redirect()->route('admin.dashboard');
             }
 
-        return back()->with('error', 'Email atau password salah');
+            return redirect()->route('home');
+        }
+
+        return back()->withErrors([
+            'email' => 'Email atau password salah'
+        ])->onlyInput('email');
     }
+
 
     // ======================
     // LOGOUT
@@ -76,10 +91,10 @@ class AuthController extends Controller
     {
         Auth::logout();
 
-        // Hapus session
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
         return redirect()->route('login');
     }
+
 }

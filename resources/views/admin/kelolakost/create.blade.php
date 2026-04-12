@@ -1,160 +1,153 @@
 @extends('admin.layouts.admin')
 
 @section('content')
-<div class="max-w-4xl mx-auto">
-    <div class="flex items-center justify-between mb-8">
-        <div>
-            <h1 class="text-2xl font-bold">
-                Tambah <span class="text-[#0047FF]">Kost Baru</span>
-            </h1>
-            <p class="text-sm text-gray-500">
-                Masukkan detail informasi kosan secara lengkap.
-            </p>
+<div class="max-w-3xl mx-auto mt-10 bg-white p-10 rounded-3xl shadow-md">
+
+    <h1 class="text-2xl font-bold mb-6 text-center">Tambah Kost Baru</h1>
+
+    @if ($errors->any())
+        <div class="bg-red-100 text-red-600 p-4 mb-6 rounded">
+            @foreach ($errors->all() as $error)
+                <p>{{ $error }}</p>
+            @endforeach
         </div>
-        <a href="{{ route('admin.kost.index') }}"
-           class="text-sm text-gray-500 hover:text-blue-600 transition flex items-center gap-2">
-            <i class="fa fa-arrow-left"></i> Kembali ke Daftar
-        </a>
-    </div>
+    @endif
+  
+    <form action="{{ route('admin.kost.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+        @csrf
 
-    <div class="bg-white rounded-[40px] shadow-sm border p-10">
-        <form action="{{ route('admin.kost.store') }}"
-              method="POST"
-              enctype="multipart/form-data"
-              class="space-y-8">
+        <input type="text" name="nama" value="{{ old('nama') }}" placeholder="Nama Kost"
+               class="w-full border border-gray-300 rounded-xl px-5 py-3 focus:ring-2 focus:ring-blue-500 outline-none" required>
 
-            @csrf
+        <input type="number" name="harga" value="{{ old('harga') }}" placeholder="Harga per Bulan"
+               class="w-full border border-gray-300 rounded-xl px-5 py-3 focus:ring-2 focus:ring-blue-500 outline-none" required>
 
-            {{-- Nama & Harga --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                    <label class="block text-sm font-bold mb-3">Nama Kost</label>
-                    <input type="text"
-                           name="nama"
-                           value="{{ old('nama') }}"
-                           required
-                           class="w-full px-5 py-3 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none"
-                           placeholder="Contoh: Kost MAMA ATA">
-                </div>
+        {{-- ✅ TAMBAH: Input jumlah kamar --}}
+        <input type="number" name="jumlah_kamar" value="{{ old('jumlah_kamar') }}" placeholder="Jumlah Kamar" min="1"
+               class="w-full border border-gray-300 rounded-xl px-5 py-3 focus:ring-2 focus:ring-blue-500 outline-none" required>
 
-                <div>
-                    <label class="block text-sm font-bold mb-3">Harga per Tahun (Rp)</label>
-                    <input type="number"
-                           name="harga"
-                           value="{{ old('harga') }}"
-                           required
-                           class="w-full px-5 py-3 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none"
-                           placeholder="1500000">
-                </div>
-            </div>
+        <input type="text" name="lokasi" value="{{ old('lokasi') }}" placeholder="Lokasi"
+               class="w-full border border-gray-300 rounded-xl px-5 py-3 focus:ring-2 focus:ring-blue-500 outline-none" required>
 
-            {{-- Lokasi --}}
-            <div>
-                <label class="block text-sm font-bold mb-3">Lokasi</label>
-                <input type="text"
-                       name="lokasi"
-                       value="{{ old('lokasi') }}"
-                       required
-                       class="w-full px-5 py-3 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none"
-                       placeholder="Contoh: Bandung, dekat Telkom University">
-            </div>
+        <textarea name="alamat" rows="3" placeholder="Alamat Lengkap"
+                  class="w-full border border-gray-300 rounded-xl px-5 py-3 focus:ring-2 focus:ring-blue-500 outline-none" required>{{ old('alamat') }}</textarea>
 
-            {{-- Alamat --}}
-            <div>
-                <label class="block text-sm font-bold mb-3">Alamat Lengkap</label>
-                <textarea name="alamat"
-                          rows="3"
-                          required
-                          class="w-full px-5 py-3 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none"
-                          placeholder="Masukkan alamat lengkap...">{{ old('alamat') }}</textarea>
-            </div>
+        <select name="jenis"
+                class="w-full border border-gray-300 rounded-xl px-5 py-3 focus:ring-2 focus:ring-blue-500 outline-none">
+            <option value="Putra" {{ old('jenis') == 'Putra' ? 'selected' : '' }}>Putra</option>
+            <option value="Putri" {{ old('jenis') == 'Putri' ? 'selected' : '' }}>Putri</option>
+            <option value="Campur" {{ old('jenis') == 'Campur' ? 'selected' : '' }}>Campur</option>
+        </select>
 
-            {{-- Jenis & Upload --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {{-- Fasilitas --}}
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+            @php $facilities = ['AC','WiFi','Lemari','CCTV','Dapur','Parkir','Kamar Mandi Dalam','Mesin Cuci']; @endphp
+            @foreach($facilities as $f)
+            <label class="flex items-center gap-2">
+                <input type="checkbox" name="fasilitas[]" value="{{ $f }}" {{ in_array($f, old('fasilitas', [])) ? 'checked' : '' }}>
+                <span>{{ $f }}</span>
+            </label>
+            @endforeach
+        </div>
 
-                <div>
-                    <label class="block text-sm font-bold mb-3">Jenis Kost</label>
-                    <select name="jenis"
-                            class="w-full px-5 py-3 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none">
-                        <option value="Putri" {{ old('jenis') == 'Putri' ? 'selected' : '' }}>Putri</option>
-                    </select>
-                </div>
+        {{-- Upload Foto --}}
+        <label class="block mb-2 font-medium">Upload Foto Kost</label>
+        <div id="drop-area"
+            class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:border-blue-500 transition">
+            <p class="text-gray-500">Drag & Drop foto di sini atau klik untuk memilih</p>
+            <input type="file" name="gambar[]" id="gambar" multiple class="hidden">
+        </div>
+        <div id="preview-gambar" class="grid grid-cols-3 gap-3 mt-4"></div>
 
-                <div>
-                    <label class="block text-sm font-bold mb-3">Foto Kost</label>
-                    <input type="file"
-                           name="gambar[]"
-                           id="gambar"
-                           multiple
-                           required
-                           class="w-full px-3 py-2 text-sm text-gray-500 
-                                  file:mr-4 file:py-2 file:px-4 
-                                  file:rounded-full file:border-0 
-                                  file:text-sm file:font-semibold 
-                                  file:bg-blue-50 file:text-blue-700 
-                                  hover:file:bg-blue-100 transition">
-
-                    @error('gambar.*')
-                        <p class="text-red-500 text-xs mt-2">{{ $message }}</p>
-                    @enderror
+        {{-- Upload Video --}}
+        <div class="border-t pt-6">
+            <label class="block mb-2 font-semibold text-gray-700">🎥 Upload Video Kost</label>
+            <p class="text-sm text-gray-400 mb-3">Format: MP4, AVI, MOV. Maksimal 50MB per video.</p>
+            <div id="video-wrapper" class="space-y-3">
+                <div class="video-row flex gap-3 items-center">
+                    <input type="file" name="video[]" accept="video/mp4,video/avi,video/quicktime"
+                           class="flex-1 border border-gray-300 rounded-xl px-4 py-2 text-sm">
+                    <input type="text" name="judul_video[]" placeholder="Judul video (opsional)"
+                           class="flex-1 border border-gray-300 rounded-xl px-4 py-2 text-sm">
+                    <button type="button" onclick="hapusRowVideo(this)"
+                            class="text-red-400 hover:text-red-600 font-bold text-xl leading-none">✕</button>
                 </div>
             </div>
+            <button type="button" onclick="tambahRowVideo()"
+                    class="mt-3 text-blue-600 hover:underline text-sm font-medium">+ Tambah Video Lain</button>
+            <div id="preview-video" class="grid grid-cols-1 gap-4 mt-4"></div>
+        </div>
 
-            {{-- Preview Image --}}
-            <div id="preview" class="grid grid-cols-3 gap-4"></div>
-
-            {{-- Fasilitas --}}
-            <div>
-                <label class="block text-sm font-bold mb-4">Fasilitas Kamar</label>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    @php
-                        $facilities = ['AC', 'WiFi', 'Lemari', 'CCTV', 'Dapur', 'Parkir', 'Kamar Mandi Dalam', 'Mesin Cuci'];
-                    @endphp
-
-                    @foreach($facilities as $f)
-                    <label class="flex items-center gap-3 cursor-pointer group">
-                        <input type="checkbox"
-                               name="fasilitas[]"
-                               value="{{ $f }}"
-                               {{ in_array($f, old('fasilitas', [])) ? 'checked' : '' }}
-                               class="w-5 h-5 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500">
-                        <span class="text-sm text-gray-600 group-hover:text-blue-600">
-                            {{ $f }}
-                        </span>
-                    </label>
-                    @endforeach
-                </div>
-            </div>
-
-            {{-- Submit --}}
-            <div class="pt-6">
-                <button type="submit"
-                        class="w-full bg-[#0047FF] text-white font-bold py-4 rounded-3xl shadow-lg hover:bg-blue-700 transition">
-                    Simpan Data Kost
-                </button>
-            </div>
-
-        </form>
-    </div>
+        <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition">Simpan Kost</button>
+    </form>
 </div>
 
-{{-- Script Preview Multiple Image --}}
 <script>
-document.getElementById('gambar').addEventListener('change', function(event) {
-    let preview = document.getElementById('preview');
-    preview.innerHTML = '';
+const dropArea    = document.getElementById("drop-area");
+const inputGambar = document.getElementById("gambar");
+const previewGambar = document.getElementById("preview-gambar");
 
-    Array.from(event.target.files).forEach(file => {
-        let reader = new FileReader();
+dropArea.addEventListener("click", () => inputGambar.click());
+inputGambar.addEventListener("change", function(e) { showPreviewGambar(e.target.files); });
+dropArea.addEventListener("dragover", (e) => { e.preventDefault(); dropArea.classList.add("border-blue-500","bg-blue-50"); });
+dropArea.addEventListener("dragleave", () => { dropArea.classList.remove("border-blue-500","bg-blue-50"); });
+dropArea.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropArea.classList.remove("border-blue-500","bg-blue-50");
+    inputGambar.files = e.dataTransfer.files;
+    showPreviewGambar(e.dataTransfer.files);
+});
+
+function showPreviewGambar(files) {
+    previewGambar.innerHTML = "";
+    Array.from(files).forEach(file => {
+        const reader = new FileReader();
         reader.onload = function(e) {
-            let img = document.createElement('img');
+            let img = document.createElement("img");
             img.src = e.target.result;
-            img.classList.add('w-full','h-32','object-cover','rounded-xl','shadow');
-            preview.appendChild(img);
-        }
+            img.classList.add("w-full","h-32","object-cover","rounded-xl","shadow");
+            previewGambar.appendChild(img);
+        };
         reader.readAsDataURL(file);
     });
+}
+
+function tambahRowVideo() {
+    const wrapper = document.getElementById("video-wrapper");
+    const row = document.createElement("div");
+    row.className = "video-row flex gap-3 items-center";
+    row.innerHTML = `
+        <input type="file" name="video[]" accept="video/mp4,video/avi,video/quicktime"
+               class="flex-1 border border-gray-300 rounded-xl px-4 py-2 text-sm"
+               onchange="previewVideoSingle(this)">
+        <input type="text" name="judul_video[]" placeholder="Judul video (opsional)"
+               class="flex-1 border border-gray-300 rounded-xl px-4 py-2 text-sm">
+        <button type="button" onclick="hapusRowVideo(this)"
+                class="text-red-400 hover:text-red-600 font-bold text-xl leading-none">✕</button>
+    `;
+    wrapper.appendChild(row);
+}
+
+function hapusRowVideo(btn) {
+    const row = btn.closest(".video-row");
+    if (document.querySelectorAll(".video-row").length > 1) row.remove();
+}
+
+function previewVideoSingle(input) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    const url = URL.createObjectURL(file);
+    const wrapper = document.createElement("div");
+    wrapper.className = "rounded-xl overflow-hidden shadow border border-gray-200";
+    wrapper.innerHTML = `
+        <video controls class="w-full rounded-xl max-h-48"><source src="${url}" type="${file.type}"></video>
+        <p class="text-xs text-gray-500 px-2 py-1 truncate">${file.name}</p>
+    `;
+    document.getElementById("preview-video").appendChild(wrapper);
+}
+
+document.querySelector(".video-row input[type=file]").addEventListener("change", function() {
+    previewVideoSingle(this);
 });
 </script>
-
 @endsection

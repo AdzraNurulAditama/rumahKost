@@ -3,59 +3,62 @@
 namespace App\Http\Controllers;
 
 use App\Models\Penyewa;
+use App\Models\Kamar;
 use Illuminate\Http\Request;
 
 class PenyewaController extends Controller
 {
     public function index()
     {
-        $penyewas = Penyewa::latest()->get();
+        $penyewas = Penyewa::with(['user', 'kost', 'kamar'])->latest()->paginate(5);
         return view('admin.penyewa.index', compact('penyewas'));
     }
 
-    public function store(Request $request)
+    public function update(Request $request, $id)
     {
         $request->validate([
-            'nama' => 'required',
-            'email' => 'required|email',
-            'nomor_telepon' => 'required',
-            'no_kamar' => 'required',
-            'nama_kost' => 'required',
-            'status' => 'required',
-            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+            'status' => 'required|in:menunggu,disetujui,ditolak'
         ]);
 
-        $path = null;
+        $penyewa = Penyewa::findOrFail($id);
+        $statusLama = $penyewa->status;
 
-        if ($request->hasFile('foto')) {
-            $path = $request->file('foto')->store('penyewa', 'public');
+        $penyewa->update(['status' => $request->status]);
+
+        // ✅ TAMBAH: Update status kamar otomatis
+        if ($request->status === 'disetujui' && $penyewa->kamar_id) {
+            // Tandai kamar jadi Terisi
+            Kamar::where('id', $penyewa->kamar_id)->update(['status' => 'Terisi']);
         }
 
-        Penyewa::create([
-            'nama_lengkap' => $request->nama,
-            'email' => $request->email,
-            'nomor_telepon' => $request->nomor_telepon,
-            'no_kamar' => $request->no_kamar,
-            'nama_kost' => $request->nama_kost,
-            'status' => $request->status,
-            'foto' => $path,
-        ]);
+        if (in_array($request->status, ['ditolak', 'menunggu']) && $penyewa->kamar_id) {
+            // Kembalikan kamar jadi Kosong
+            Kamar::where('id', $penyewa->kamar_id)->update(['status' => 'Kosong']);
+        }
 
-        return redirect()->route('admin.penyewa.index')
-            ->with('success', 'Penyewa berhasil ditambahkan.');
+        return back()->with('success', 'Status penyewa berhasil diupdate');
     }
 
     public function destroy($id)
     {
         $penyewa = Penyewa::findOrFail($id);
 
-        if ($penyewa->foto && file_exists(storage_path('app/public/' . $penyewa->foto))) {
-            unlink(storage_path('app/public/' . $penyewa->foto));
+        // ✅ TAMBAH: Kembalikan status kamar ke Kosong saat data dihapus
+        if ($penyewa->kamar_id) {
+            Kamar::where('id', $penyewa->kamar_id)->update(['status' => 'Kosong']);
         }
 
         $penyewa->delete();
+        return back()->with('success', 'Penyewa berhasil dihapus');
+    }
 
-        return redirect()->route('admin.penyewa.index')
-            ->with('success', 'Penyewa berhasil dihapus.');
+    public function kosanSaya()
+    {
+        $penyewas = Penyewa::with('kost')
+            ->where('user_id', auth()->id())
+            ->latest()
+            ->get();
+
+        return view('user.kosan_saya', compact('penyewas'));
     }
 }

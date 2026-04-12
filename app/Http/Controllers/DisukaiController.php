@@ -4,20 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Like;
+
 
 class DisukaiController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resource.use App\Models\Like;
      */
     public function index()
-    {
-        // Ambil data user yang sedang login
-        $user = \Illuminate\Support\Facades\Auth::user();
+{
+    $user = auth()->user();
+    $likes = Like::with('kost')
+        ->where('user_id', auth()->id())
+        ->get();
 
-        return view('user.disukai', compact('user'));
-    }
-
+     return view('user.disukai', compact('likes', 'user'));
+}
     /**
      * Show the form for creating a new resource.
      */

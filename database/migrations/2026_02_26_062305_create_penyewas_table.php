@@ -6,21 +6,32 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::create('penyewas', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_lengkap');
-            $table->string('email');
-            $table->string('nomor_telepon');
-            $table->string('no_kamar');
-            $table->string('nama_kost');
-            $table->enum('status', ['Aktif', 'Tidak Aktif'])->default('Aktif');
-            $table->string('foto')->nullable();
+
+            // relasi ke kost
+            $table->foreignId('kost_id')->constrained()->cascadeOnDelete();
+
+            // data penyewa
+            $table->integer('jumlah_orang');
+            $table->date('tgl_masuk');
+
+            // status
+            $table->enum('status', ['menunggu', 'disetujui', 'ditolak'])
+                  ->default('menunggu');
+
             $table->timestamps();
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('penyewas');

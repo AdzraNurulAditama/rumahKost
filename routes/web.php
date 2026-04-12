@@ -1,14 +1,25 @@
 <?php
+use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\UserProfileController;
+use App\Http\Controllers\Admin\KelolaPembayaranController as AdminKelolaPembayaranController;
+use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DisukaiController;
+use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KelolaKostController;
-use App\Http\Controllers\AdminDashboardController;
-use App\Http\Controllers\PenyewaController; 
-use App\Http\Controllers\PencarianController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserProfileController;
+use App\Http\Controllers\TransaksiController;
+use App\Http\Controllers\PembayaranController;
+use App\Http\Controllers\PengajuanController;
+use App\Http\Controllers\KelolaKamarController;
+use App\Http\Controllers\PenyewaController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\LikeController;
+use App\Http\Controllers\KelolaPembayaranController;
+use App\Http\Controllers\ChatController;
+use App\Http\Controllers\MidtransController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,102 +27,153 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-// HOME
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-// DETAIL KOST (USER LIHAT DETAIL)
-Route::get('/kost/{id}', [HomeController::class, 'detail'])
-    ->name('kost.detail');
+Route::get('/kost/{id}', [HomeController::class, 'detail'])->name('kost.detail');
 
-// REGISTER
 Route::get('/register', function () {
     return view('user.auth.register');
 })->name('register');
 
-Route::post('/register', [AuthController::class, 'register'])
-    ->name('register.process');
+Route::post('/register', [AuthController::class, 'register'])->name('register.process');
 
-// LOGIN
-Route::get('/login', [AuthController::class, 'showLogin'])
-    ->name('login');
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.process');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::post('/login', [AuthController::class, 'login'])
-    ->name('login.process');
-
-Route::post('/logout', [AuthController::class, 'logout'])
-    ->name('logout');
-
-
+Route::post('/midtrans/callback', [MidtransController::class, 'callback']);
 /*
 |--------------------------------------------------------------------------
-| USER (WAJIB LOGIN)
+| USER
 |--------------------------------------------------------------------------
 */
 
 Route::prefix('user')->name('user.')->middleware('auth')->group(function () {
 
-    // FAVORIT
-    Route::get('/disukai', [DisukaiController::class, 'index'])
-        ->name('disukai');
+    Route::get('/disukai', [DisukaiController::class, 'index'])->name('disukai');
+    Route::post('/like/{id}', [LikeController::class, 'toggle'])->name('like.toggle');
 
-    // PROFILE
-    Route::get('/profile', [UserProfileController::class, 'index'])
-        ->name('profile');
-});
+    Route::get('/profile', [UserProfileController::class, 'index'])->name('profile');
+    Route::post('/profile/update', [UserProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile/photo', [UserProfileController::class, 'deletePhoto'])->name('profile.photo.delete');
 
+    Route::get('/kost/{id}/gallery', [GalleryController::class, 'index'])->name('gallery');
+
+    Route::get('/transaksi', [TransaksiController::class, 'index'])->name('transaksi');
+
+    // Route untuk nampilin halaman blade pengajuan
+    Route::get('/pengajuan-sewa/{id}', [PengajuanController::class, 'show'])->name('pengajuan');
+
+    // Route untuk proses submit form (target action form kamu)
+    Route::post('/pengajuan-sewa/{id}', [PengajuanController::class, 'create'])->name('pengajuan.create');
+    Route::get('/pengajuan-status/{id}', [PengajuanController::class, 'status'])->name('pengajuan.status');
+    Route::delete('/pengajuan-batal/{id}', [PengajuanController::class, 'batal'])->name('pengajuan.batal');
+
+    Route::get('/sewa', [PengajuanController::class,'riwayat'])->name('sewa');
+    Route::get('/kosan-saya', [PenyewaController::class,'kosanSaya'])->name('kosan.saya');
+
+    // PEMBAYARAN
+    Route::get('/pembayaran/{id}', [PembayaranController::class, 'index'])
+        ->name('pembayaran.index');
+
+    Route::post('/pembayaran/{id}', [PembayaranController::class, 'bayar'])
+        ->name('pembayaran.bayar');
+
+        
+        // ======================
+    // CHAT USER
+    // ======================
+    
+    // buka chat langsung
+    Route::get('/chat/{user}', [ChatController::class, 'index'])
+    ->name('chat.room');
+    
+    // kirim pesan
+    Route::post('/chat/send', [ChatController::class, 'send'])
+    ->name('chat.send');
+    
+    // dari tombol "Chat Admin" di halaman kost
+    Route::get('/chat/kost/{kost}', [ChatController::class, 'chatKost'])
+    ->name('chat.kost');
+
+    // ✅ ULASAN (BARU DITAMBAHKAN)
+    Route::get('/ulasan', [ReviewController::class, 'index'])->name('ulasan');
+    
+    });
+
+    
+
+    // REVIEW
+    Route::post('/review/{kost}', [ReviewController::class, 'store'])
+        ->name('review.store');
+
+    Route::delete('/review/{id}', [ReviewController::class, 'destroy'])
+        ->name('review.delete');
 
 /*
 |--------------------------------------------------------------------------
-| PROTECTED (ADMIN)
+| ADMIN
 |--------------------------------------------------------------------------
 */
 
 Route::prefix('admin')->name('admin.')->group(function () {
 
-    // Dashboard Admin
-    Route::get('/dashboard', [AdminDashboardController::class, 'index'])
-        ->name('dashboard');
+    Route::get('/login',[AdminAuthController::class,'showLogin'])->name('login');
+    Route::post('/login',[AdminAuthController::class,'login'])->name('login.process');
 
-    /*
-    |------------------------------------------------------------------
-    | KELOLA KOST
-    |------------------------------------------------------------------
-    */
+    Route::get('/register',[AdminAuthController::class,'showRegister'])->name('register');
+    Route::post('/register',[AdminAuthController::class,'register'])->name('register.process');
 
-    Route::get('/kost', [KelolaKostController::class, 'index'])
-        ->name('kost.index');
+    Route::middleware('auth')->group(function () {
 
-    Route::get('/kost/create', [KelolaKostController::class, 'create'])
-        ->name('kost.create');
+        Route::post('/logout',[AdminAuthController::class,'logout'])->name('logout');
 
-    Route::post('/kost', [KelolaKostController::class, 'store'])
-        ->name('kost.store');
+        Route::get('/dashboard', [AdminDashboardController::class, 'index'])
+            ->name('dashboard');
 
-    Route::get('/kost/{kost}/edit', [KelolaKostController::class, 'edit'])
-        ->name('kost.edit');
+        // KELOLA KOST
 
-    Route::put('/kost/{kost}', [KelolaKostController::class, 'update'])
-        ->name('kost.update');
+        // ✅ Harus di atas Route::resource
+        Route::delete('kost/image/{id}', [KelolaKostController::class, 'destroyImage'])
+            ->name('kost.image.delete');
 
-    Route::delete('/kost/{kost}', [KelolaKostController::class, 'destroy'])
-        ->name('kost.destroy');
+        Route::delete('kost/video/{id}', [KelolaKostController::class, 'destroyVideo'])
+            ->name('kost.video.delete');
+            
+        Route::resource('kost', KelolaKostController::class);    
 
-    Route::delete('/kost/image/{image}', [KelolaKostController::class, 'deleteImage'])
-        ->name('kost.image.delete');
+        // PENYEWA
+        Route::get('/penyewa', [PenyewaController::class, 'index'])->name('penyewa.index');
+        Route::put('/penyewa/{id}', [PenyewaController::class, 'update'])->name('penyewa.update');
+        Route::delete('/penyewa/{id}', [PenyewaController::class,'destroy'])->name('penyewa.destroy');
 
+        // KAMAR
+        Route::get('/kelola-kamar', [KelolaKamarController::class, 'index'])->name('kamar.index');
+        Route::get('/kelola-kamar/create', [KelolaKamarController::class, 'create'])->name('kamar.create');
+        Route::post('/kelola-kamar', [KelolaKamarController::class, 'store'])->name('kamar.store');
+        Route::put('/kelola-kamar/{id}', [KelolaKamarController::class, 'update'])->name('kamar.update');
+        Route::delete('/kelola-kamar/{id}', [KelolaKamarController::class, 'destroy'])->name('kamar.destroy'); // ✅ TAMBAH
 
-    /*
-    |------------------------------------------------------------------
-    | KELOLA PENYEWA
-    |------------------------------------------------------------------
-    */
+        // PEMBAYARAN
+        Route::resource('pembayaran', KelolaPembayaranController::class);
+        
 
-    Route::get('/penyewa', [PenyewaController::class, 'index'])
-        ->name('penyewa.index');
+        // ======================
+        // CHAT ADMIN
+        // ======================
 
-    Route::post('/penyewa', [PenyewaController::class, 'store'])
-        ->name('penyewa.store');
+        // list semua user
+        Route::get('/chat', [ChatController::class, 'adminIndex'])
+            ->name('chat.index');
 
-    Route::delete('/penyewa/{id}', [PenyewaController::class, 'destroy'])
-        ->name('penyewa.destroy');
+        // buka chat user
+        Route::get('/chat/{user}', [ChatController::class, 'index'])
+            ->name('chat.room');
+
+        // kirim pesan
+        Route::post('/chat/send', [ChatController::class, 'send'])
+            ->name('chat.send');
+
+    });
+
 });

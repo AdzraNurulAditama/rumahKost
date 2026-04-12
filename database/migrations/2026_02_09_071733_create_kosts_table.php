@@ -16,9 +16,8 @@ return new class extends Migration
             $table->string('nama');
             $table->text('alamat');
             $table->string('lokasi');
-            $table->string('jenis'); // ✅ ini penting
+            $table->string('jenis'); 
             $table->integer('harga');
-            $table->string('gambar');
             $table->string('status');
             $table->json('fasilitas');
             // 1 kolom fasilitas (JSON)

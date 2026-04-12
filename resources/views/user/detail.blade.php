@@ -1,217 +1,234 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-6xl mx-auto px-6 py-10 font-sans text-gray-800">
 
-    {{-- Galeri Foto --}}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<div class="max-w-6xl mx-auto px-6 py-10 text-gray-800">
+
+    @php
+        $isLiked = \App\Models\Like::where('user_id', auth()->id())
+                    ->where('kost_id', $kost->id)
+                    ->exists();
+    @endphp
+
+    {{-- FOTO --}}
+    @php $images = $kost->images; @endphp
+
     <div class="mb-6">
-        {{-- Foto Utama --}}
-        <div class="w-full h-[300px] md:h-[400px] bg-gray-200 rounded-xl mb-4">
-            @if($kost->images && $kost->images->count())
-                <img src="{{ asset('storage/' . $kost->images->first()->path) }}" class="w-full h-full object-cover rounded-xl" alt="Foto Utama">
+        <div class="w-full h-[300px] md:h-[400px] bg-gray-200 rounded-xl mb-4 overflow-hidden">
+            @if($images && $images->count())
+                <img id="mainImage"
+                     src="{{ asset('images/kost/' . $images->first()->image) }}"
+                     class="w-full h-full object-cover">
+            @else
+                <div class="flex items-center justify-center h-full text-gray-400">Tidak ada gambar</div>
             @endif
         </div>
-        
-        {{-- Thumbnail Bawah --}}
-        <div class="grid grid-cols-3 gap-4 h-[120px] md:h-[150px]">
-            <div class="bg-gray-200 rounded-xl w-full h-full object-cover"></div>
-            <div class="bg-gray-200 rounded-xl w-full h-full object-cover"></div>
-            <div class="bg-gray-200 rounded-xl w-full h-full relative">
-                <button class="absolute bottom-3 right-3 bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                    Lihat Semua Foto
-                </button>
-            </div>
+
+        <div class="grid grid-cols-3 gap-4 h-[120px]">
+            @for($i = 1; $i <= 3; $i++)
+                <div class="bg-gray-200 rounded-xl overflow-hidden relative">
+                    @if(isset($images[$i]))
+                        <img src="{{ asset('images/kost/'.$images[$i]->image) }}"
+                             onclick="changeImage(this.src)"
+                             class="w-full h-full object-cover cursor-pointer">
+                    @endif
+                    @if($i == 3)
+                        <a href="{{ route('user.gallery',$kost->id) }}"
+                           class="absolute bottom-2 right-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                            Lihat Semua
+                        </a>
+                    @endif
+                </div>
+            @endfor
         </div>
     </div>
 
-    {{-- Tabs Foto / Video --}}
-    <div class="flex gap-3 mb-6">
-        <button class="flex items-center gap-2 border border-gray-300 px-4 py-2 rounded-lg text-sm font-medium">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-            Foto
-        </button>
-        <button class="flex items-center gap-2 border border-gray-300 px-4 py-2 rounded-lg text-sm font-medium text-gray-500">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-            Video
-        </button>
-    </div>
-
-    {{-- Header Content (Judul & Aksi) --}}
-    <div class="flex justify-between items-start mb-6">
+    {{-- HEADER --}}
+    <div class="flex justify-between items-start mb-2">
         <div>
-            <div class="flex items-center gap-3 mb-1">
-                <h1 class="text-3xl font-bold">{{ $kost->nama }}</h1>
-                <span class="bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full">Putra</span>
-            </div>
-            <a href="#" class="text-blue-600 text-sm font-medium hover:underline">Premium</a>
+            <h1 class="text-3xl font-bold">{{ $kost->nama }}</h1>
+            {{-- ✅ Badge jenis kost --}}
+            <span class="inline-block mt-1 bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full">
+                {{ $kost->jenis }}
+            </span>
         </div>
-        <div class="flex gap-4 items-center text-blue-600">
-            <button class="hover:text-red-500 transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg></button>
-            <button class="hover:text-blue-800 transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg></button>
-        </div>
-    </div>
-
-    {{-- Info Bar (Lokasi & Rating) --}}
-    <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-8 pb-6 border-b">
-        <div class="flex items-center gap-1">
-            <span>📍</span> {{ $kost->lokasi }}
-        </div>
-        <div class="flex items-center gap-1">
-            <span>🚪</span> 20 Kamar Tersedia
-        </div>
-        <div class="flex items-center gap-1 text-yellow-400">
-            ★★★★★ <span class="text-gray-800 font-bold ml-1">5.0</span>
+        <div class="flex gap-4 text-xl text-gray-500">
+            <button onclick="toggleLike(this)" data-url="{{ route('user.like.toggle', $kost->id) }}">
+                <i class="fa-heart {{ $isLiked ? 'fa-solid text-red-500' : 'fa-regular text-gray-400' }}"></i>
+            </button>
+            <button onclick="sharePage()">
+                <i class="fa-solid fa-share-nodes"></i>
+            </button>
         </div>
     </div>
 
-    {{-- Main Grid Content --}}
+    <div class="flex flex-wrap gap-4 text-sm text-gray-600 mb-8 border-b pb-6">
+        <div><i class="fa-solid fa-location-dot"></i> {{ $kost->lokasi }}</div>
+        <div><i class="fa-solid fa-house"></i> {{ $kost->alamat }}</div>
+        <div class="text-yellow-500">
+            <i class="fa-solid fa-star"></i> {{ number_format($kost->reviews->avg('rating'), 1) ?? '0.0' }}
+            <span class="text-gray-400">({{ $kost->reviews->count() }} ulasan)</span>
+        </div>
+        {{-- ✅ Sisa kamar --}}
+        <div class="{{ $sisaKamar == 0 ? 'text-red-500' : 'text-green-600' }} font-semibold">
+            <i class="fa-solid fa-bed"></i>
+            @if($sisaKamar == 0) Kamar penuh
+            @else Tersisa {{ $sisaKamar }} kamar
+            @endif
+        </div>
+    </div>
+
     <div class="grid md:grid-cols-3 gap-10">
 
-        {{-- Kiri (Detail) --}}
+        {{-- LEFT --}}
         <div class="md:col-span-2">
-            
-            {{-- Deskripsi --}}
+
+            {{-- DESKRIPSI --}}
             <div class="mb-8">
-                <h2 class="text-lg font-bold mb-3">Deskripsi</h2>
-                <p class="text-gray-600 leading-relaxed text-sm text-justify">
-                    {{ $kost->deskripsi ?? 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.' }}
-                </p>
+                <h2 class="font-bold mb-2">Deskripsi</h2>
+                <p class="text-sm text-gray-600">{{ $kost->deskripsi ?? 'Tidak ada deskripsi tersedia.' }}</p>
             </div>
 
-            {{-- Spesifikasi Tipe Kamar --}}
-            <div class="mb-8">
-                <h2 class="text-lg font-bold mb-4">Spesifikasi Tipe Kamar</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-600">
-                    <div class="flex items-center gap-3">
-                        <span class="w-6 h-6 bg-gray-100 rounded flex items-center justify-center">📏</span>
-                        3.6 x 2.4 meter
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <span class="w-6 h-6 bg-gray-100 rounded flex items-center justify-center">⚡</span>
-                        Tidak termasuk listrik
-                    </div>
-                </div>
-            </div>
+            {{-- ✅ TAMBAH: TIPE KAMAR TERSEDIA --}}
+            @php
+                $tipeKamar = \App\Models\Kamar::where('kost_id', $kost->id)
+                    ->where('status', 'Kosong')
+                    ->get()
+                    ->groupBy('tipe_kamar');
+            @endphp
 
-            {{-- Fasilitas Kamar --}}
+            @if($tipeKamar->isNotEmpty())
             <div class="mb-8">
-                <h2 class="text-lg font-bold mb-4">Fasilitas Kamar</h2>
-                <div class="grid grid-cols-2 gap-y-4 text-sm text-gray-600">
-                    {{-- Ini bisa diubah pakai @foreach jika data dinamis --}}
-                    <div class="flex items-center gap-3"><span>❄️</span> AC</div>
-                    <div class="flex items-center gap-3"><span>🛏️</span> Kasur</div>
-                    <div class="flex items-center gap-3"><span>🪑</span> Meja</div>
-                    <div class="flex items-center gap-3"><span>📺</span> TV</div>
-                    <div class="flex items-center gap-3"><span>🚪</span> Lemari</div>
-                    <div class="flex items-center gap-3"><span>🪟</span> Jendela</div>
-                    <div class="flex items-center gap-3"><span>🛋️</span> Bantal</div>
-                    <div class="flex items-center gap-3"><span>🪑</span> Kursi</div>
-                    <div class="flex items-center gap-3"><span>🥖</span> Guling</div>
-                </div>
-            </div>
-
-            {{-- Fasilitas Kamar Mandi --}}
-            <div class="mb-8">
-                <h2 class="text-lg font-bold mb-4">Fasilitas Kamar Mandi</h2>
-                <div class="grid grid-cols-2 gap-y-4 text-sm text-gray-600">
-                    <div class="flex items-center gap-3"><span>🛁</span> K. Mandi Dalam</div>
-                    <div class="flex items-center gap-3"><span>🚽</span> Kloset Duduk</div>
-                    <div class="flex items-center gap-3"><span>🚿</span> Shower</div>
-                    <div class="flex items-center gap-3"><span>♨️</span> Air panas</div>
-                </div>
-            </div>
-
-            {{-- Peraturan Khusus --}}
-            <div class="mb-8">
-                <h2 class="text-lg font-bold mb-4">Peraturan Khusus Kamar ini</h2>
-                <div class="flex flex-col gap-3 text-sm text-gray-600">
-                    <div class="flex items-center gap-3"><span>⚠️</span> Tamu menginap dikenakan biaya</div>
-                    <div class="flex items-center gap-3"><span>👥</span> Tipe ini bisa diisi maks. 2 orang/kamar</div>
-                    <div class="flex items-center gap-3"><span>🚫</span> Tidak untuk pasutri</div>
-                    <div class="flex items-center gap-3"><span>🚷</span> Tidak boleh bawa anak</div>
-                    <div class="flex justify-between items-start mt-2">
-                        <div class="flex items-start gap-3">
-                            <span>💰</span>
-                            <div>
-                                <p class="font-medium text-gray-800">Deposit</p>
-                                <p class="text-xs text-gray-500">Dikembalikan di akhir periode sewa jika tidak ditemukan kerusakan</p>
-                            </div>
+                <h2 class="font-bold mb-3">Tipe Kamar Tersedia</h2>
+                <div class="space-y-3">
+                    @foreach($tipeKamar as $tipe => $kamars)
+                    <div class="border border-gray-200 rounded-xl p-4 flex justify-between items-center">
+                        <div>
+                            <p class="font-semibold text-gray-800">{{ $tipe }}</p>
+                            <p class="text-sm text-gray-500 mt-1">
+                                <i class="fa-solid fa-door-open text-blue-500 mr-1"></i>
+                                {{ $kamars->count() }} kamar tersedia
+                            </p>
                         </div>
-                        <span class="font-medium text-gray-800">Rp300.000</span>
+                        <div class="text-right">
+                            <p class="font-bold text-blue-600">Rp {{ number_format($kamars->first()->harga, 0, ',', '.') }}</p>
+                            <p class="text-xs text-gray-400">/bulan</p>
+                        </div>
                     </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+
+            {{-- FASILITAS --}}
+            <div class="mb-8">
+                <h2 class="font-bold mb-3">Fasilitas</h2>
+                @php
+                    $fasilitas = is_array($kost->fasilitas) ? $kost->fasilitas : explode(',', $kost->fasilitas);
+                @endphp
+                <div class="grid grid-cols-2 gap-3 text-sm text-gray-700">
+                    @foreach($fasilitas as $item)
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-circle-check text-blue-500"></i>
+                            {{ trim($item) }}
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            {{-- REVIEW --}}
+            <div class="mt-12">
+                <h2 class="text-xl font-bold mb-6">Ulasan Penghuni</h2>
+
+                @auth
+                <div class="bg-white p-5 rounded-xl shadow mb-8">
+                    <form action="{{ route('review.store', $kost->id) }}" method="POST">
+                        @csrf
+                        <textarea name="komentar" rows="3"
+                            class="w-full border rounded-lg p-3 text-sm"
+                            placeholder="Tulis ulasan kamu..." required></textarea>
+                        <div class="flex justify-between items-center mt-3">
+                            @php $currentRating = old('rating') ?? ($kost->rating ?? 0); @endphp
+                            <div class="flex gap-1 text-2xl cursor-pointer" id="starRating">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <span data-value="{{ $i }}"
+                                        class="star {{ $i <= $currentRating ? 'text-yellow-400' : 'text-gray-300' }}">★</span>
+                                @endfor
+                            </div>
+                            <input type="hidden" name="rating" id="ratingInput" required>
+                            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Kirim</button>
+                        </div>
+                    </form>
+                </div>
+                @else
+                    <p class="text-sm text-gray-500 mb-6">Login dulu untuk memberi ulasan</p>
+                @endauth
+
+                <div class="space-y-4">
+                    @forelse($kost->reviews as $review)
+                        <div class="bg-gray-50 p-4 rounded-xl border">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm">
+                                        {{ strtoupper(substr($review->user->username ?? 'U', 0, 1)) }}
+                                    </div>
+                                    <span class="font-semibold text-sm">{{ $review->user->username ?? 'tidak diketahui' }}</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-yellow-500 text-sm">⭐ {{ $review->rating }}</span>
+                                    @auth
+                                        @if(auth()->id() == $review->user_id)
+                                            <form action="{{ route('review.delete', $review->id) }}" method="POST">
+                                                @csrf @method('DELETE')
+                                                <button class="text-red-500 text-xs">Hapus</button>
+                                            </form>
+                                        @endif
+                                    @endauth
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-2 ml-11">{{ $review->komentar }}</p>
+                        </div>
+                    @empty
+                        <p class="text-gray-500 text-sm">Belum ada ulasan</p>
+                    @endforelse
                 </div>
             </div>
 
         </div>
 
-        {{-- Kanan (Card Pemesanan) --}}
+        {{-- RIGHT --}}
         <div>
-            <div class="bg-white p-5 rounded-2xl shadow-[0_0_15px_rgba(0,0,0,0.05)] border border-gray-100 sticky top-6">
-                
-                {{-- Harga & Diskon --}}
-                <div class="mb-4 border-b pb-4">
-                    <div class="flex items-center gap-2 mb-1 text-sm">
-                        <span class="bg-yellow-100 text-yellow-700 font-semibold px-2 py-0.5 rounded text-xs flex items-center gap-1">
-                            % Diskon 69rb
-                        </span>
-                        <span class="text-gray-400 line-through">Rp. 2.325.000</span>
-                    </div>
-                    <div class="flex items-end gap-1 mb-3">
-                        <h3 class="text-2xl font-bold">Rp. 2.256.000</h3>
-                        <span class="text-xs text-gray-500 mb-1">(bulan pertama)</span>
-                    </div>
+            <div class="bg-white p-5 rounded-2xl shadow border sticky top-6">
 
-                    {{-- Pilihan Pembayaran --}}
-                    <div class="grid grid-cols-2 gap-2 mt-4">
-                        <div>
-                            <p class="text-[10px] text-gray-500 mb-1">Pembayaran</p>
-                            <select class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 text-blue-600 bg-white">
-                                <option>dd/mm/yy</option>
-                            </select>
-                        </div>
-                        <div>
-                            <p class="text-[10px] text-gray-500 mb-1">&nbsp;</p>
-                            <select class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 text-white bg-blue-600 outline-none">
-                                <option>Per Tahun</option>
-                                <option>Per Bulan</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
+                <h3 class="text-2xl font-bold mb-1 text-blue-600">
+                    Rp {{ number_format($kost->harga ?? 0, 0, ',', '.') }}
+                </h3>
+                <p class="text-xs text-gray-400 mb-4">/bulan</p>
 
-                {{-- Box Kalkulasi Pembayaran --}}
-                <div class="border border-gray-100 rounded-xl p-4 mb-4 text-xs text-gray-600 bg-gray-50/50">
-                    <p class="mb-2 font-medium">Jika kamu bayar pakai DP:</p>
-                    <div class="flex justify-between mb-1">
-                        <span class="underline decoration-dotted cursor-pointer">Uang muka (DP)</span>
-                        <span>Rp705.000</span>
-                    </div>
-                    <div class="flex justify-between mb-4">
-                        <span class="underline decoration-dotted cursor-pointer">Pelunasan</span>
-                        <span>Rp1.881.000</span>
-                    </div>
-
-                    <p class="mb-2 font-medium">Jika kamu pakai pembayaran penuh:</p>
-                    <div class="flex justify-between mb-4">
-                        <span class="underline decoration-dotted cursor-pointer">Pembayaran Penuh</span>
-                        <span>Rp2.571.000</span>
-                    </div>
-
-                    <div class="border-t border-dashed pt-3 flex justify-between font-bold text-gray-800 text-sm mt-2">
-                        <span>Total Pembayaran Pertama</span>
-                        <span>Rp2.571.000</span>
-                    </div>
-                </div>
-
-                {{-- Action Buttons --}}
-                <div class="flex flex-col gap-3">
-                    <button class="w-full border border-blue-600 text-blue-600 font-medium py-2.5 rounded-xl hover:bg-blue-50 transition flex items-center justify-center gap-2 text-sm">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-                        Tanya Pemilik
-                    </button>
-                    <button class="w-full bg-blue-600 text-white font-medium py-2.5 rounded-xl hover:bg-blue-700 transition text-sm">
+                @if($sisaKamar > 0)
+                    <a href="{{ route('user.pengajuan', $kost->id) }}"
+                       class="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-3 rounded-xl font-semibold transition duration-200 shadow">
                         Ajukan Sewa
+                    </a>
+                @else
+                    <button disabled
+                       class="block w-full bg-gray-400 text-white text-center py-3 rounded-xl font-semibold cursor-not-allowed">
+                        Kamar Penuh
                     </button>
+                @endif
+
+                <div class="mt-3">
+                    <a href="{{ route('user.chat.kost', $kost->id) }}"
+                       class="flex items-center justify-center gap-2 w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-xl transition duration-200 shadow">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.77 9.77 0 01-4-.8L3 20l1.2-3.2A7.93 7.93 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                        Chat Admin
+                    </a>
+                    <p class="text-xs text-gray-500 mt-2 text-center">Tanya ketersediaan kamar langsung ke admin</p>
                 </div>
 
             </div>
@@ -220,4 +237,59 @@
     </div>
 
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+
+    window.changeImage = function(src) {
+        document.getElementById('mainImage').src = src;
+    }
+
+    const stars = document.querySelectorAll('.star');
+    const ratingInput = document.getElementById('ratingInput');
+    let selectedRating = 0;
+
+    stars.forEach((star, index) => {
+        star.addEventListener('click', () => {
+            selectedRating = index + 1;
+            ratingInput.value = selectedRating;
+            updateStars(selectedRating);
+        });
+        star.addEventListener('mouseover', () => { updateStars(index + 1); });
+        star.addEventListener('mouseleave', () => { updateStars(selectedRating); });
+    });
+
+    function updateStars(rating){
+        stars.forEach((s, i) => {
+            if(i < rating){ s.classList.add('text-yellow-400'); s.classList.remove('text-gray-300'); }
+            else { s.classList.add('text-gray-300'); s.classList.remove('text-yellow-400'); }
+        });
+    }
+
+    window.toggleLike = function(btn){
+        const icon = btn.querySelector('i');
+        const url = btn.getAttribute('data-url');
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.status === 'liked'){ icon.classList.remove('fa-regular'); icon.classList.add('fa-solid', 'text-red-500'); }
+            else if(data.status === 'unliked'){ icon.classList.remove('fa-solid', 'text-red-500'); icon.classList.add('fa-regular'); }
+        })
+        .catch(err => console.log('ERROR:', err));
+    }
+
+    window.sharePage = function(){
+        navigator.clipboard.writeText(window.location.href);
+        alert("Link berhasil disalin!");
+    }
+
+});
+</script>
+
 @endsection
