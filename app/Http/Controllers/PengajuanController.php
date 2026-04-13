@@ -64,24 +64,40 @@
             }
 
             $sewa = $pengajuan;
-            $snapToken = $this->generateSnapToken($sewa, $pengajuan->kost);
+            $snapToken = null;
+            $errorMessage = null;
 
-            return view('user.pembayaran.index', compact('pengajuan', 'sewa', 'snapToken'));
+            try {
+                $snapToken = $this->generateSnapToken($sewa, $pengajuan->kost);
+            } catch (\Exception $e) {
+                \Log::error('Midtrans error: ' . $e->getMessage());
+                $errorMessage = 'Gagal menghubungi server pembayaran. Silakan coba lagi.';
+            }
+
+            return view('user.pembayaran.index', compact('pengajuan', 'sewa', 'snapToken', 'errorMessage'));
         }
 
         private function generateSnapToken($sewa, $kost)
         {
             Config::$serverKey = config('midtrans.server_key');
-            Config::$isProduction = false;
+            Config::$isProduction = config('midtrans.is_production', false);
             Config::$isSanitized = true;
             Config::$is3ds = true;
         
             $user = Auth::user();
             $harga = (int) $kost->harga;
+
+            // Gunakan order_id konsisten via session
+            $sessionKey = 'snap_order_id_' . $sewa->id;
+            $orderId = session($sessionKey);
+            if (!$orderId) {
+                $orderId = 'SEWA-' . $sewa->id . '-' . time();
+                session([$sessionKey => $orderId]);
+            }
         
             $params = [
                 'transaction_details' => [
-                    'order_id'     => 'SEWA-' . $sewa->id . '-' . time(),
+                    'order_id'     => $orderId,
                     'gross_amount' => $harga,
                 ],
                 'customer_details' => [

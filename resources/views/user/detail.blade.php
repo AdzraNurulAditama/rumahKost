@@ -4,12 +4,45 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
+{{-- ❤️ TOAST NOTIF --}}
+<div id="toast"
+     class="fixed top-6 right-6 z-50 flex items-center gap-3 bg-white border border-gray-100 shadow-xl rounded-2xl px-5 py-4 transition-all duration-500 opacity-0 translate-y-[-20px] pointer-events-none"
+     style="min-width:260px">
+    <div id="toast-icon" class="w-9 h-9 rounded-full flex items-center justify-center text-lg shrink-0"></div>
+    <div>
+        <p id="toast-title" class="font-bold text-gray-800 text-sm leading-tight"></p>
+        <p id="toast-sub" class="text-xs text-gray-400 mt-0.5"></p>
+    </div>
+</div>
+
+{{-- 🔒 MODAL LOGIN --}}
+<div id="modal-login"
+     class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300">
+    <div class="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-sm mx-4 text-center transform scale-95 transition-transform duration-300" id="modal-box">
+        <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fa-solid fa-heart text-red-400 text-2xl"></i>
+        </div>
+        <h3 class="text-xl font-black text-gray-800 mb-2">Login Dulu, Yuk!</h3>
+        <p class="text-sm text-gray-500 mb-6">Kamu perlu login untuk menyimpan kost favorit kamu.</p>
+        <div class="flex gap-3">
+            <button onclick="closeLoginModal()"
+                    class="flex-1 border border-gray-200 text-gray-600 font-semibold py-2.5 rounded-xl hover:bg-gray-50 transition text-sm">
+                Nanti Dulu
+            </button>
+            <a href="{{ route('login') }}"
+               class="flex-1 bg-blue-600 text-white font-semibold py-2.5 rounded-xl hover:bg-blue-700 transition text-sm">
+                Login Sekarang
+            </a>
+        </div>
+    </div>
+</div>
+
 <div class="max-w-6xl mx-auto px-6 py-10 text-gray-800">
 
     @php
-        $isLiked = \App\Models\Like::where('user_id', auth()->id())
-                    ->where('kost_id', $kost->id)
-                    ->exists();
+        $isLiked = auth()->check()
+            ? \App\Models\Like::where('user_id', auth()->id())->where('kost_id', $kost->id)->exists()
+            : false;
     @endphp
 
     {{-- FOTO --}}
@@ -49,13 +82,17 @@
     <div class="flex justify-between items-start mb-2">
         <div>
             <h1 class="text-3xl font-bold">{{ $kost->nama }}</h1>
-            {{-- ✅ Badge jenis kost --}}
             <span class="inline-block mt-1 bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full">
                 {{ $kost->jenis }}
             </span>
         </div>
         <div class="flex gap-4 text-xl text-gray-500">
-            <button onclick="toggleLike(this)" data-url="{{ route('user.like.toggle', $kost->id) }}">
+            <button id="like-btn"
+                    onclick="toggleLike(this)"
+                   data-url="{{ route('user.like.toggle', $kost->id) }}"
+                    data-auth="{{ auth()->check() ? 'true' : 'false' }}"
+                    data-nama="{{ $kost->nama }}"
+                    class="transition-transform hover:scale-125 active:scale-110 duration-150">
                 <i class="fa-heart {{ $isLiked ? 'fa-solid text-red-500' : 'fa-regular text-gray-400' }}"></i>
             </button>
             <button onclick="sharePage()">
@@ -71,7 +108,6 @@
             <i class="fa-solid fa-star"></i> {{ number_format($kost->reviews->avg('rating'), 1) ?? '0.0' }}
             <span class="text-gray-400">({{ $kost->reviews->count() }} ulasan)</span>
         </div>
-        {{-- ✅ Sisa kamar --}}
         <div class="{{ $sisaKamar == 0 ? 'text-red-500' : 'text-green-600' }} font-semibold">
             <i class="fa-solid fa-bed"></i>
             @if($sisaKamar == 0) Kamar penuh
@@ -91,7 +127,7 @@
                 <p class="text-sm text-gray-600">{{ $kost->deskripsi ?? 'Tidak ada deskripsi tersedia.' }}</p>
             </div>
 
-            {{-- ✅ TAMBAH: TIPE KAMAR TERSEDIA --}}
+            {{-- TIPE KAMAR TERSEDIA --}}
             @php
                 $tipeKamar = \App\Models\Kamar::where('kost_id', $kost->id)
                     ->where('status', 'Kosong')
@@ -245,19 +281,22 @@ document.addEventListener('DOMContentLoaded', function(){
         document.getElementById('mainImage').src = src;
     }
 
+    // ⭐ STAR RATING
     const stars = document.querySelectorAll('.star');
     const ratingInput = document.getElementById('ratingInput');
     let selectedRating = 0;
 
-    stars.forEach((star, index) => {
-        star.addEventListener('click', () => {
-            selectedRating = index + 1;
-            ratingInput.value = selectedRating;
-            updateStars(selectedRating);
+    if (stars.length) {
+        stars.forEach((star, index) => {
+            star.addEventListener('click', () => {
+                selectedRating = index + 1;
+                ratingInput.value = selectedRating;
+                updateStars(selectedRating);
+            });
+            star.addEventListener('mouseover', () => { updateStars(index + 1); });
+            star.addEventListener('mouseleave', () => { updateStars(selectedRating); });
         });
-        star.addEventListener('mouseover', () => { updateStars(index + 1); });
-        star.addEventListener('mouseleave', () => { updateStars(selectedRating); });
-    });
+    }
 
     function updateStars(rating){
         stars.forEach((s, i) => {
@@ -266,9 +305,24 @@ document.addEventListener('DOMContentLoaded', function(){
         });
     }
 
+    // ❤️ TOGGLE LIKE
     window.toggleLike = function(btn){
+        const isAuth = btn.getAttribute('data-auth') === 'true';
+
+        // Belum login → tampilkan modal
+        if (!isAuth) {
+            openLoginModal();
+            return;
+        }
+
         const icon = btn.querySelector('i');
-        const url = btn.getAttribute('data-url');
+        const url  = btn.getAttribute('data-url');
+        const nama = btn.getAttribute('data-nama');
+
+        // Animasi kecil saat klik
+        btn.classList.add('scale-125');
+        setTimeout(() => btn.classList.remove('scale-125'), 200);
+
         fetch(url, {
             method: 'POST',
             headers: {
@@ -278,15 +332,92 @@ document.addEventListener('DOMContentLoaded', function(){
         })
         .then(res => res.json())
         .then(data => {
-            if(data.status === 'liked'){ icon.classList.remove('fa-regular'); icon.classList.add('fa-solid', 'text-red-500'); }
-            else if(data.status === 'unliked'){ icon.classList.remove('fa-solid', 'text-red-500'); icon.classList.add('fa-regular'); }
+            if (data.status === 'liked') {
+                icon.classList.remove('fa-regular', 'text-gray-400');
+                icon.classList.add('fa-solid', 'text-red-500');
+                showToast(
+                    '❤️',
+                    'bg-red-50',
+                    'text-red-500',
+                    'Ditambahkan ke Favorit!',
+                    nama + ' tersimpan di Disukai',
+                    true
+                );
+            } else if (data.status === 'unliked') {
+                icon.classList.remove('fa-solid', 'text-red-500');
+                icon.classList.add('fa-regular', 'text-gray-400');
+                showToast(
+                    '🤍',
+                    'bg-gray-50',
+                    'text-gray-400',
+                    'Dihapus dari Favorit',
+                    nama + ' dihapus dari Disukai',
+                    false
+                );
+            }
         })
         .catch(err => console.log('ERROR:', err));
     }
 
+    // 🔔 TOAST
+    function showToast(emoji, bgClass, textClass, title, sub, showLink) {
+        const toast     = document.getElementById('toast');
+        const toastIcon = document.getElementById('toast-icon');
+        const toastTitle = document.getElementById('toast-title');
+        const toastSub  = document.getElementById('toast-sub');
+
+        toastIcon.className = `w-9 h-9 rounded-full flex items-center justify-center text-lg shrink-0 ${bgClass} ${textClass}`;
+        toastIcon.textContent = emoji;
+        toastTitle.textContent = title;
+
+        if (showLink) {
+            toastSub.innerHTML = sub + ' · <a href="{{ route("user.disukai") }}" class="text-blue-500 font-semibold hover:underline">Lihat Favorit</a>';
+        } else {
+            toastSub.textContent = sub;
+        }
+
+        // Tampilkan
+        toast.classList.remove('opacity-0', 'translate-y-[-20px]', 'pointer-events-none');
+        toast.classList.add('opacity-100', 'translate-y-0');
+
+        // Sembunyikan setelah 3.5 detik
+        clearTimeout(window._toastTimer);
+        window._toastTimer = setTimeout(() => {
+            toast.classList.remove('opacity-100', 'translate-y-0');
+            toast.classList.add('opacity-0', 'translate-y-[-20px]', 'pointer-events-none');
+        }, 3500);
+    }
+
+    // 🔒 MODAL LOGIN
+    window.openLoginModal = function() {
+        const modal = document.getElementById('modal-login');
+        const box   = document.getElementById('modal-box');
+        modal.classList.remove('opacity-0', 'pointer-events-none');
+        modal.classList.add('opacity-100');
+        setTimeout(() => box.classList.remove('scale-95'), 10);
+        box.classList.add('scale-100');
+    }
+
+    window.closeLoginModal = function() {
+        const modal = document.getElementById('modal-login');
+        const box   = document.getElementById('modal-box');
+        box.classList.remove('scale-100');
+        box.classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modal.classList.remove('opacity-100');
+        }, 200);
+    }
+
+    // Klik di luar modal → tutup
+    document.getElementById('modal-login').addEventListener('click', function(e) {
+        if (e.target === this) closeLoginModal();
+    });
+
+    // 🔗 SHARE
     window.sharePage = function(){
         navigator.clipboard.writeText(window.location.href);
-        alert("Link berhasil disalin!");
+        showToast('🔗', 'bg-blue-50', 'text-blue-500', 'Link Disalin!', window.location.href, false);
     }
 
 });

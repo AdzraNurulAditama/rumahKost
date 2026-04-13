@@ -80,9 +80,6 @@
                         <a href="{{ route('user.profile') }}" class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-gray-600 hover:bg-white/50 transition rounded-xl">
                             <i class="fa-solid fa-user w-4 text-gray-500"></i> Akun
                         </a>
-                        <a href="#" class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-gray-600 hover:bg-white/50 transition rounded-xl">
-                            <i class="fa-solid fa-location-dot w-4 text-gray-500"></i> Alamat
-                        </a>
                         <a href="/user/chat" class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-gray-600 hover:bg-white/50 transition rounded-xl">
                             <i class="fa-solid fa-bell w-4 text-gray-500"></i> Notifikasi
                         </a>

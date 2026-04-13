@@ -63,11 +63,16 @@
             </div>
         </div>
 
-        <div>
-            <label class="block font-medium mb-2">Tambah Foto Baru</label>
-            <input type="file" name="gambar[]" id="gambar" multiple class="w-full border rounded-xl p-2">
-            <div id="preview-gambar" class="grid grid-cols-3 gap-2 mt-2"></div>
-        </div>
+       <div>
+    <label class="block font-medium mb-2">Tambah Foto Baru</label>
+    <div id="drop-area"
+        class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:border-blue-500 transition">
+        <p class="text-gray-500"> Drag & Drop foto di sini atau <span class="text-blue-500 underline">klik untuk memilih</span></p>
+        <!-- <p class="text-xs text-gray-400 mt-1">Bisa pilih banyak foto sekaligus</p> -->
+        <input type="file" name="gambar[]" id="gambar" multiple class="hidden">
+    </div>
+    <div id="preview-gambar" class="grid grid-cols-3 gap-2 mt-4"></div>
+</div>
 
         @if($kost->videos->count() > 0)
         <div class="border-t pt-6">
@@ -112,20 +117,34 @@
 </div>
 
 <script>
-document.getElementById('gambar').addEventListener('change', function(event) {
-    let preview = document.getElementById('preview-gambar');
-    preview.innerHTML = '';
-    Array.from(event.target.files).forEach(file => {
-        let reader = new FileReader();
+const dropArea = document.getElementById("drop-area");
+const inputGambar = document.getElementById("gambar");
+const previewGambar = document.getElementById("preview-gambar");
+
+dropArea.addEventListener("click", () => inputGambar.click());
+inputGambar.addEventListener("change", function(e) { showPreviewGambar(e.target.files); });
+dropArea.addEventListener("dragover", (e) => { e.preventDefault(); dropArea.classList.add("border-blue-500","bg-blue-50"); });
+dropArea.addEventListener("dragleave", () => { dropArea.classList.remove("border-blue-500","bg-blue-50"); });
+dropArea.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropArea.classList.remove("border-blue-500","bg-blue-50");
+    inputGambar.files = e.dataTransfer.files;
+    showPreviewGambar(e.dataTransfer.files);
+});
+
+function showPreviewGambar(files) {
+    previewGambar.innerHTML = "";
+    Array.from(files).forEach(file => {
+        const reader = new FileReader();
         reader.onload = function(e) {
-            let img = document.createElement('img');
+            let img = document.createElement("img");
             img.src = e.target.result;
-            img.classList.add('w-full','h-32','object-cover','rounded-xl','shadow');
-            preview.appendChild(img);
+            img.classList.add("w-full","h-32","object-cover","rounded-xl","shadow");
+            previewGambar.appendChild(img);
         };
         reader.readAsDataURL(file);
     });
-});
+}
 
 function tambahRowVideo() {
     const wrapper = document.getElementById("video-wrapper");

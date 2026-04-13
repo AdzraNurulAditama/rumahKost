@@ -59,7 +59,6 @@ class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-blue-600 bg-white ro
 <i class="fa-solid fa-house w-4 text-blue-600"></i> Kosan Saya
 </a>
 
-{{-- ✅ FIX: Ulasan sudah ada route --}}
 <a href="{{ route('user.ulasan') }}"
 class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-gray-600 hover:bg-white/50 transition rounded-xl">
 <i class="fa-solid fa-star w-4 text-gray-500"></i> Ulasan
@@ -125,34 +124,49 @@ Kosan Saya
 
 <div class="bg-white border rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition">
 
+@if($sewa->kost->images->first())
 <img src="{{ asset('images/kost/'.$sewa->kost->images->first()->image) }}"
 class="h-40 w-full object-cover">
+@else
+<div class="h-40 w-full bg-blue-50 flex items-center justify-center">
+    <i class="fa-solid fa-house text-blue-200 text-3xl"></i>
+</div>
+@endif
 
 <div class="p-4">
 
 <h3 class="font-bold text-gray-800 text-lg mb-1">
-{{ $sewa->kost->nama}}
+{{ $sewa->kost->nama }}
 </h3>
 
-<p class="text-xs text-gray-500 mb-2">
-Kamar : {{ $sewa->no_kamar ?? 'belum ditentukan' }}
+{{-- ✅ FIX: pakai relasi kamar->nomor_kamar --}}
+<p class="text-xs text-gray-500 mb-1 flex items-center gap-1">
+    <i class="fa-solid fa-door-open text-blue-400"></i>
+    Kamar :
+    @if($sewa->kamar)
+        <span class="font-semibold text-gray-700">{{ $sewa->kamar->nomor_kamar }}</span>
+        <span class="text-gray-400">({{ $sewa->kamar->tipe_kamar }})</span>
+    @else
+        <span class="text-gray-400">Belum ditentukan</span>
+    @endif
 </p>
 
-<p class="text-xs text-gray-500 mb-3">
-Mulai Sewa : {{ \Carbon\Carbon::parse($sewa->tgl_masuk)->format('d M Y') }}
+<p class="text-xs text-gray-500 mb-3 flex items-center gap-1">
+    <i class="fa-solid fa-calendar text-blue-400"></i>
+    Mulai Sewa : {{ \Carbon\Carbon::parse($sewa->tgl_masuk)->format('d M Y') }}
 </p>
 
 {{-- STATUS --}}
 <div class="mb-4">
-
 @if($sewa->status == 'menunggu')
 <span class="bg-yellow-100 text-yellow-700 px-4 py-1 rounded-full text-xs font-semibold">Menunggu Persetujuan</span>
 @elseif($sewa->status == 'disetujui')
 <span class="bg-green-100 text-green-700 px-4 py-1 rounded-full text-xs font-semibold">Disetujui</span>
+@elseif($sewa->status == 'lunas')
+<span class="bg-blue-100 text-blue-700 px-4 py-1 rounded-full text-xs font-semibold">✅ Lunas</span>
 @elseif($sewa->status == 'ditolak')
 <span class="bg-red-100 text-red-700 px-4 py-1 rounded-full text-xs font-semibold">Ditolak</span>
 @endif
-
 </div>
 
 <a href="{{ route('user.pengajuan.status',$sewa->id) }}"

@@ -25,14 +25,12 @@ class PenyewaController extends Controller
 
         $penyewa->update(['status' => $request->status]);
 
-        // ✅ TAMBAH: Update status kamar otomatis
+        // ✅ Update status kamar otomatis
         if ($request->status === 'disetujui' && $penyewa->kamar_id) {
-            // Tandai kamar jadi Terisi
             Kamar::where('id', $penyewa->kamar_id)->update(['status' => 'Terisi']);
         }
 
         if (in_array($request->status, ['ditolak', 'menunggu']) && $penyewa->kamar_id) {
-            // Kembalikan kamar jadi Kosong
             Kamar::where('id', $penyewa->kamar_id)->update(['status' => 'Kosong']);
         }
 
@@ -43,7 +41,6 @@ class PenyewaController extends Controller
     {
         $penyewa = Penyewa::findOrFail($id);
 
-        // ✅ TAMBAH: Kembalikan status kamar ke Kosong saat data dihapus
         if ($penyewa->kamar_id) {
             Kamar::where('id', $penyewa->kamar_id)->update(['status' => 'Kosong']);
         }
@@ -54,7 +51,7 @@ class PenyewaController extends Controller
 
     public function kosanSaya()
     {
-        $penyewas = Penyewa::with('kost')
+        $penyewas = Penyewa::with(['kost', 'kost.images', 'kamar'])
             ->where('user_id', auth()->id())
             ->latest()
             ->get();
