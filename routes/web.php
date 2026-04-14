@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Admin\KelolaPembayaranController as AdminKelolaPembayaranController;
@@ -28,7 +29,6 @@ use App\Http\Controllers\MidtransController;
 */
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-
 Route::get('/kost/{id}', [HomeController::class, 'detail'])->name('kost.detail');
 
 Route::get('/register', function () {
@@ -42,6 +42,7 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.process');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::post('/midtrans/callback', [MidtransController::class, 'callback']);
+
 /*
 |--------------------------------------------------------------------------
 | USER
@@ -53,6 +54,7 @@ Route::prefix('user')->name('user.')->middleware('auth')->group(function () {
     Route::get('/disukai', [DisukaiController::class, 'index'])->name('disukai');
     Route::post('/like/{id}', [LikeController::class, 'toggle'])->name('like.toggle');
 
+    // PROFILE
     Route::get('/profile', [UserProfileController::class, 'index'])->name('profile');
     Route::post('/profile/update', [UserProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile/photo', [UserProfileController::class, 'deletePhoto'])->name('profile.photo.delete');
@@ -61,10 +63,8 @@ Route::prefix('user')->name('user.')->middleware('auth')->group(function () {
 
     Route::get('/transaksi', [TransaksiController::class, 'index'])->name('transaksi');
 
-    // Route untuk nampilin halaman blade pengajuan
+    // PENGAJUAN
     Route::get('/pengajuan-sewa/{id}', [PengajuanController::class, 'show'])->name('pengajuan');
-
-    // Route untuk proses submit form (target action form kamu)
     Route::post('/pengajuan-sewa/{id}', [PengajuanController::class, 'create'])->name('pengajuan.create');
     Route::get('/pengajuan-status/{id}', [PengajuanController::class, 'status'])->name('pengajuan.status');
     Route::delete('/pengajuan-batal/{id}', [PengajuanController::class, 'batal'])->name('pengajuan.batal');
@@ -73,42 +73,24 @@ Route::prefix('user')->name('user.')->middleware('auth')->group(function () {
     Route::get('/kosan-saya', [PenyewaController::class,'kosanSaya'])->name('kosan.saya');
 
     // PEMBAYARAN
-    Route::get('/pembayaran/{id}', [PembayaranController::class, 'index'])
-        ->name('pembayaran.index');
+    Route::get('/pembayaran/{id}', [PembayaranController::class, 'index'])->name('pembayaran.index');
+    Route::post('/pembayaran/{id}', [PembayaranController::class, 'bayar'])->name('pembayaran.bayar');
 
-    Route::post('/pembayaran/{id}', [PembayaranController::class, 'bayar'])
-        ->name('pembayaran.bayar');
-
-        
-        // ======================
+    // ======================
     // CHAT USER
     // ======================
-    
-    // buka chat langsung
-    Route::get('/chat/{user}', [ChatController::class, 'index'])
-    ->name('chat.room');
-    
-    // kirim pesan
-    Route::post('/chat/send', [ChatController::class, 'send'])
-    ->name('chat.send');
-    
-    // dari tombol "Chat Admin" di halaman kost
-    Route::get('/chat/kost/{kost}', [ChatController::class, 'chatKost'])
-    ->name('chat.kost');
+    Route::get('/chat/{user}', [ChatController::class, 'index'])->name('chat.room');
+    Route::post('/chat/send', [ChatController::class, 'send'])->name('chat.send');
+    Route::get('/chat/kost/{kost}', [ChatController::class, 'chatKost'])->name('chat.kost');
 
-    // ✅ ULASAN (BARU DITAMBAHKAN)
+    // ULASAN
     Route::get('/ulasan', [ReviewController::class, 'index'])->name('ulasan');
-    
-    });
 
-    
+});
 
-    // REVIEW
-    Route::post('/review/{kost}', [ReviewController::class, 'store'])
-        ->name('review.store');
-
-    Route::delete('/review/{id}', [ReviewController::class, 'destroy'])
-        ->name('review.delete');
+// REVIEW GLOBAL
+Route::post('/review/{kost}', [ReviewController::class, 'store'])->name('review.store');
+Route::delete('/review/{id}', [ReviewController::class, 'destroy'])->name('review.delete');
 
 /*
 |--------------------------------------------------------------------------
@@ -128,19 +110,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::post('/logout',[AdminAuthController::class,'logout'])->name('logout');
 
-        Route::get('/dashboard', [AdminDashboardController::class, 'index'])
-            ->name('dashboard');
+        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+        // 🔥 FIX UTAMA (INI YANG KURANG TADI)
+        Route::get('/profile', [UserProfileController::class, 'index'])->name('profile');
 
         // KELOLA KOST
-
-        // ✅ Harus di atas Route::resource
-        Route::delete('kost/image/{id}', [KelolaKostController::class, 'destroyImage'])
-            ->name('kost.image.delete');
-
-        Route::delete('kost/video/{id}', [KelolaKostController::class, 'destroyVideo'])
-            ->name('kost.video.delete');
-            
-        Route::resource('kost', KelolaKostController::class);    
+        Route::delete('kost/image/{id}', [KelolaKostController::class, 'destroyImage'])->name('kost.image.delete');
+        Route::delete('kost/video/{id}', [KelolaKostController::class, 'destroyVideo'])->name('kost.video.delete');
+        Route::resource('kost', KelolaKostController::class);
 
         // PENYEWA
         Route::get('/penyewa', [PenyewaController::class, 'index'])->name('penyewa.index');
@@ -152,27 +130,17 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/kelola-kamar/create', [KelolaKamarController::class, 'create'])->name('kamar.create');
         Route::post('/kelola-kamar', [KelolaKamarController::class, 'store'])->name('kamar.store');
         Route::put('/kelola-kamar/{id}', [KelolaKamarController::class, 'update'])->name('kamar.update');
-        Route::delete('/kelola-kamar/{id}', [KelolaKamarController::class, 'destroy'])->name('kamar.destroy'); // ✅ TAMBAH
+        Route::delete('/kelola-kamar/{id}', [KelolaKamarController::class, 'destroy'])->name('kamar.destroy');
 
         // PEMBAYARAN
         Route::resource('pembayaran', KelolaPembayaranController::class);
-        
 
         // ======================
         // CHAT ADMIN
         // ======================
-
-        // list semua user
-        Route::get('/chat', [ChatController::class, 'adminIndex'])
-            ->name('chat.index');
-
-        // buka chat user
-        Route::get('/chat/{user}', [ChatController::class, 'index'])
-            ->name('chat.room');
-
-        // kirim pesan
-        Route::post('/chat/send', [ChatController::class, 'send'])
-            ->name('chat.send');
+        Route::get('/chat', [ChatController::class, 'adminIndex'])->name('chat.index');
+        Route::get('/chat/{user}', [ChatController::class, 'index'])->name('chat.room');
+        Route::post('/chat/send', [ChatController::class, 'send'])->name('chat.send');
 
     });
 

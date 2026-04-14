@@ -11,20 +11,22 @@ use Illuminate\Support\Facades\Auth;
 class ChatController extends Controller
 {
     // ======================
-    // USER / ADMIN - ROOM CHAT
+    // ROOM CHAT (USER & ADMIN)
     // ======================
     public function index(User $user)
     {
-        $messages = Message::where(function ($q) use ($user) {
-            $q->where('sender_id', Auth::id())
+        $authId = Auth::id();
+
+        $messages = Message::where(function ($q) use ($user, $authId) {
+            $q->where('sender_id', $authId)
               ->where('receiver_id', $user->id);
-        })->orWhere(function ($q) use ($user) {
+        })->orWhere(function ($q) use ($user, $authId) {
             $q->where('sender_id', $user->id)
-              ->where('receiver_id', Auth::id());
-        })->orderBy('created_at')->get();
+              ->where('receiver_id', $authId);
+        })->orderBy('created_at', 'asc')->get();
 
         // CEK ROLE
-        if (Auth::user()->role == 'admin') {
+        if (Auth::user()->role === 'admin') {
             return view('admin.chat.room', compact('messages', 'user'));
         }
 
@@ -39,8 +41,8 @@ class ChatController extends Controller
     {
         $request->validate([
             'receiver_id' => 'required|exists:users,id',
-            'message' => 'nullable|string',
-            'file' => 'nullable|file|mimes:jpg,jpeg,png,pdf,docx|max:2048'
+            'message'     => 'nullable|string',
+            'file'        => 'nullable|file|mimes:jpg,jpeg,png,gif,webp,pdf,docx|max:5120'
         ]);
 
         // biar ga kosong dua-duanya
@@ -50,16 +52,21 @@ class ChatController extends Controller
 
         $filePath = null;
 
-        // upload file
+        // ======================
+        // UPLOAD FILE
+        // ======================
         if ($request->hasFile('file')) {
             $filePath = $request->file('file')->store('chat_files', 'public');
         }
 
+        // ======================
+        // SIMPAN KE DATABASE
+        // ======================
         Message::create([
-            'sender_id' => Auth::id(),
+            'sender_id'   => Auth::id(),
             'receiver_id' => $request->receiver_id,
-            'message' => $request->message,
-            'file' => $filePath
+            'message'     => $request->message,
+            'image'       => $filePath // 🔥 FIX UTAMA DI SINI
         ]);
 
         return back()->with('success', 'Pesan terkirim');
@@ -71,7 +78,7 @@ class ChatController extends Controller
     // ======================
     public function adminIndex()
     {
-        $users = User::where('id', '!=', auth()->id())->get();
+        $users = User::where('id', '!=', Auth::id())->get();
 
         return view('admin.chat.index', compact('users'));
     }
