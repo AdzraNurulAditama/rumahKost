@@ -15,10 +15,9 @@
 
     <div class="max-w-[1400px] mx-auto flex flex-col md:flex-row gap-6 items-start">
         
-        {{-- SIDEBAR KIRI --}}
+        {{-- SIDEBAR --}}
         <div class="w-full md:w-[280px] bg-[#E9F0FF] rounded-[32px] p-4 min-h-[85vh]">
             
-            {{-- User Mini Card --}}
             <div class="bg-white rounded-[24px] p-6 mb-6 flex flex-col items-center text-center">
                 <div class="w-16 h-16 mb-3">
                     @php
@@ -27,144 +26,85 @@
                     
                     @if($user->photo)
                         <img src="{{ asset('storage/' . $user->photo) }}" 
-                            class="w-full h-full rounded-full object-cover border-2 border-white shadow-sm"
-                            alt="Avatar">
+                            class="w-full h-full rounded-full object-cover border-2 border-white shadow-sm">
                     @else
-                        <img src="https://ui-avatars.com/api/?name={{ urlencode($displayUsername) }}&background=DBEAFE&color=2563EB&size=128" 
-                            class="w-full h-full rounded-full object-cover border-2 border-white"
-                            alt="Avatar">
+                        <img src="https://ui-avatars.com/api/?name={{ urlencode($displayUsername) }}"
+                            class="w-full h-full rounded-full object-cover border-2 border-white">
                     @endif
                 </div>
 
-                <h3 class="font-bold text-gray-800 text-sm tracking-tight">
+                <h3 class="font-bold text-gray-800 text-sm">
                     {{ $user->username ?? 'User' }}
                 </h3>
 
-                <p class="text-[10px] text-gray-400 break-all">
+                <p class="text-[10px] text-gray-400">
                     {{ $user->email ?? '' }}
                 </p>
             </div>
 
-            {{-- Navigasi Menu --}}
             <nav class="space-y-6 px-2">
                 <div>
-                    <p class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-3 px-2">Aktivitas</p>
-                    <div class="space-y-1">
+                    <p class="text-[11px] font-black text-gray-400 uppercase mb-3 px-2">Aktivitas</p>
 
-                        {{-- Daftar Transaksi (tidak aktif) --}}
-                        <a href="{{ route('user.transaksi') }}" class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-gray-600 hover:bg-white/50 transition rounded-xl">
-                            <i class="fa-solid fa-clipboard-list w-4 text-gray-500"></i> Daftar Transaksi
-                        </a>
+                    <a href="{{ route('user.transaksi') }}" class="menu">Daftar Transaksi</a>
 
-                        {{-- Disukai (AKTIF) --}}
-                        <a href="{{ route('user.disukai') }}" class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-blue-600 bg-white rounded-xl shadow-sm border border-blue-50 font-bold">
-                            <i class="fa-solid fa-heart w-4 text-blue-500"></i> Disukai
-                        </a>
+                    <a href="{{ route('user.disukai') }}" class="menu active">Disukai</a>
 
-                        {{-- Kosan Saya --}}
-                        <a href="{{ route('user.kosan.saya') }}" class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-gray-600 hover:bg-white/50 transition rounded-xl">
-                            <i class="fa-solid fa-house w-4 text-gray-500"></i> Kosan Saya
-                        </a>
+                    <a href="{{ route('user.kosan.saya') }}" class="menu">Kosan Saya</a>
 
-                        {{-- Ulasan --}}
-                        <a href="{{ route('user.ulasan') }}" class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-gray-600 hover:bg-white/50 transition rounded-xl">
-                            <i class="fa-solid fa-star w-4 text-gray-500"></i> Ulasan
-                        </a>
+                    {{-- ✅ FIX DI SINI --}}
+                    <a href="{{ route('user.ulasan') }}" class="menu">Ulasan</a>
 
-                        {{-- Pesan --}}
-                        <a href="#" class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-gray-600 hover:bg-white/50 transition rounded-xl">
-                            <i class="fa-solid fa-comment-dots w-4 text-gray-500"></i> Pesan
-                        </a>
-                    </div>
+                    <a href="#" class="menu">Pesan</a>
                 </div>
 
                 <div>
-                    <p class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-3 px-2">Akun</p>
-                    <div class="space-y-1">
-                        <a href="{{ route('user.profile') }}" class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-gray-600 hover:bg-white/50 transition rounded-xl">
-                            <i class="fa-solid fa-user w-4 text-gray-500"></i> Akun
-                        </a>
-                        
-                        <a href="/user/chat" class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-gray-600 hover:bg-white/50 transition rounded-xl">
-                            <i class="fa-solid fa-bell w-4 text-gray-500"></i> Notifikasi
-                        </a>
-                        <a href="#" class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-gray-600 hover:bg-white/50 transition rounded-xl">
-                            <i class="fa-solid fa-wallet w-4 text-gray-500"></i> Pembayaran
-                        </a>
-                        <form action="{{ route('logout') }}" method="POST">
-                            @csrf
-                            <button type="submit" class="w-full flex items-center gap-3 px-4 py-2.5 text-[13px] text-red-500 hover:bg-red-50 transition rounded-xl">
-                                <i class="fa-solid fa-right-from-bracket w-4 text-red-400"></i> Keluar
-                            </button>
-                        </form>
-                    </div>
+                    <p class="text-[11px] font-black text-gray-400 uppercase mb-3 px-2">Akun</p>
+
+                    <a href="{{ route('user.profile') }}" class="menu">Akun</a>
+
+                    <a href="/user/chat" class="menu">Notifikasi</a>
+
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button class="menu text-red-500">Keluar</button>
+                    </form>
                 </div>
             </nav>
         </div>
 
-        {{-- MAIN CONTENT --}}
-        <div class="flex-1 bg-white rounded-[32px] shadow-sm border border-gray-100 min-h-[85vh] p-10 flex flex-col">
+        {{-- CONTENT --}}
+        <div class="flex-1 bg-white rounded-[32px] p-10">
 
-            <h2 class="text-2xl font-black text-gray-800 mb-6 leading-tight">
-                Disukai
-            </h2>
-
-            <hr class="border-gray-100 mb-6">
+            <h2 class="text-2xl font-bold mb-6">Disukai</h2>
 
             <div class="grid md:grid-cols-3 gap-6">
 
             @forelse($likes as $like)
-                <div class="border border-gray-100 rounded-2xl overflow-hidden shadow-sm bg-white hover:shadow-md transition">
+                <div class="border rounded-2xl overflow-hidden">
 
-                    @php
-                        $firstImage = $like->kost->images->first();
-                    @endphp
+                    @php $img = $like->kost->images->first(); @endphp
 
-                    @if($firstImage)
-                        <img src="{{ asset('images/kost/' . $firstImage->image) }}"
-                            class="w-full h-40 object-cover">
-                    @else
-                        <div class="w-full h-40 bg-blue-50 flex items-center justify-center">
-                            <i class="fa-solid fa-house text-blue-200 text-3xl"></i>
-                        </div>
+                    @if($img)
+                        <img src="{{ asset('images/kost/' . $img->image) }}" class="w-full h-40 object-cover">
                     @endif
                     
                     <div class="p-4">
-                        <h3 class="font-bold text-base text-gray-800 mb-1">
-                            {{ $like->kost->nama }}
-                        </h3>
+                        <h3 class="font-bold">{{ $like->kost->nama }}</h3>
 
-                        <p class="text-xs text-gray-400 mb-3 flex items-center gap-1">
-                            <i class="fa-solid fa-location-dot text-blue-400"></i>
-                            {{ $like->kost->alamat }}
-                        </p>
+                        <p class="text-xs text-gray-400">{{ $like->kost->alamat }}</p>
 
-                        <div class="flex justify-between items-center pt-2 border-t border-gray-50">
-                            <span class="text-red-400 text-xs font-medium flex items-center gap-1">
-                                <i class="fa-solid fa-heart"></i> Disukai
-                            </span>
+                        <div class="flex justify-between mt-3">
+                            <span class="text-red-400 text-xs">❤️ Disukai</span>
 
                             <a href="{{ route('kost.detail', $like->kost->id) }}"
-                                class="text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition">
-                                Lihat Detail
-                            </a>
+                               class="text-blue-600 text-xs">Detail</a>
                         </div>
                     </div>
                 </div>
 
             @empty
-                {{-- EMPTY STATE --}}
-                <div class="col-span-3 flex flex-col items-center justify-center py-20 text-center">
-                    <div class="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mb-5">
-                        <i class="fa-solid fa-heart text-red-300 text-3xl"></i>
-                    </div>
-                    <p class="text-gray-700 font-bold text-lg mb-1">Belum ada kost yang disukai</p>
-                    <p class="text-gray-400 text-sm mb-6">Temukan kost favoritmu dan simpan di sini</p>
-                    <a href="{{ route('home') }}" 
-                        class="bg-blue-600 text-white text-sm font-semibold px-6 py-2.5 rounded-xl hover:bg-blue-700 transition">
-                        Cari Kost Sekarang
-                    </a>
-                </div>
+                <p class="col-span-3 text-center text-gray-400">Belum ada kost</p>
             @endforelse
 
             </div>

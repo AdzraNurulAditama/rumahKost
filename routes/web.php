@@ -77,14 +77,16 @@ Route::prefix('user')->name('user.')->middleware('auth')->group(function () {
     Route::post('/pembayaran/{id}', [PembayaranController::class, 'bayar'])->name('pembayaran.bayar');
 
     // ======================
-    // CHAT USER
+    // 🔥 TAMBAHAN FIX ULASAN
+    // ======================
+    Route::get('/ulasan', [ReviewController::class, 'index'])->name('ulasan');
+
+    // ======================
+    // CHAT (USER & ADMIN)
     // ======================
     Route::get('/chat/{user}', [ChatController::class, 'index'])->name('chat.room');
     Route::post('/chat/send', [ChatController::class, 'send'])->name('chat.send');
     Route::get('/chat/kost/{kost}', [ChatController::class, 'chatKost'])->name('chat.kost');
-
-    // ULASAN
-    Route::get('/ulasan', [ReviewController::class, 'index'])->name('ulasan');
 
 });
 
@@ -112,7 +114,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
-        // 🔥 FIX UTAMA (INI YANG KURANG TADI)
         Route::get('/profile', [UserProfileController::class, 'index'])->name('profile');
 
         // KELOLA KOST
@@ -135,12 +136,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // PEMBAYARAN
         Route::resource('pembayaran', KelolaPembayaranController::class);
 
-        // ======================
         // CHAT ADMIN
-        // ======================
         Route::get('/chat', [ChatController::class, 'adminIndex'])->name('chat.index');
         Route::get('/chat/{user}', [ChatController::class, 'index'])->name('chat.room');
-        Route::post('/chat/send', [ChatController::class, 'send'])->name('chat.send');
 
     });
 
