@@ -18,9 +18,7 @@ use App\Http\Controllers\KelolaKamarController;
 use App\Http\Controllers\PenyewaController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\LikeController;
-use App\Http\Controllers\KelolaPembayaranController;
 use App\Http\Controllers\ChatController;
-use App\Http\Controllers\MidtransController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,7 +39,6 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.process');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::post('/midtrans/callback', [MidtransController::class, 'callback']);
 
 /*
 |--------------------------------------------------------------------------
@@ -51,9 +48,14 @@ Route::post('/midtrans/callback', [MidtransController::class, 'callback']);
 
 Route::prefix('user')->name('user.')->middleware('auth')->group(function () {
 
-    Route::get('/disukai', [DisukaiController::class, 'index'])->name('disukai');
-    Route::post('/like/{id}', [LikeController::class, 'toggle'])->name('like.toggle');
+ 
+    // ❤️ LIKE (INI YANG KAMU BUTUH)
+    Route::post('/like/{id}', [LikeController::class, 'toggle'])
+        ->name('like.toggle');
 
+    // ❤️ HALAMAN DISUKAI
+    Route::get('/disukai', [DisukaiController::class, 'index'])
+        ->name('disukai');
     // PROFILE
     Route::get('/profile', [UserProfileController::class, 'index'])->name('profile');
     Route::post('/profile/update', [UserProfileController::class, 'update'])->name('profile.update');
@@ -61,7 +63,6 @@ Route::prefix('user')->name('user.')->middleware('auth')->group(function () {
 
     Route::get('/kost/{id}/gallery', [GalleryController::class, 'index'])->name('gallery');
 
-    Route::get('/transaksi', [TransaksiController::class, 'index'])->name('transaksi');
 
     // PENGAJUAN
     Route::get('/pengajuan-sewa/{id}', [PengajuanController::class, 'show'])->name('pengajuan');
@@ -73,9 +74,7 @@ Route::prefix('user')->name('user.')->middleware('auth')->group(function () {
     Route::get('/kosan-saya', [PenyewaController::class,'kosanSaya'])->name('kosan.saya');
 
     // PEMBAYARAN
-    Route::get('/pembayaran/{id}', [PembayaranController::class, 'index'])->name('pembayaran.index');
-    Route::post('/pembayaran/{id}', [PembayaranController::class, 'bayar'])->name('pembayaran.bayar');
-
+  
     // ======================
     // 🔥 TAMBAHAN FIX ULASAN
     // ======================
@@ -89,6 +88,12 @@ Route::prefix('user')->name('user.')->middleware('auth')->group(function () {
     Route::get('/chat/kost/{kost}', [ChatController::class, 'chatKost'])->name('chat.kost');
 
 });
+    // ======================
+    // 🔥 HALAMAN MENUNGGU (GLOBAL BIAR GA ERROR)
+    // ======================
+    Route::get('/menunggu-persetujuan', function () {
+        return view('user.menunggu');
+    })->name('menunggu');
 
 // REVIEW GLOBAL
 Route::post('/review/{kost}', [ReviewController::class, 'store'])->name('review.store');
@@ -134,7 +139,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::delete('/kelola-kamar/{id}', [KelolaKamarController::class, 'destroy'])->name('kamar.destroy');
 
         // PEMBAYARAN
-        Route::resource('pembayaran', KelolaPembayaranController::class);
 
         // CHAT ADMIN
         Route::get('/chat', [ChatController::class, 'adminIndex'])->name('chat.index');
