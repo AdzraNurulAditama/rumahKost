@@ -71,29 +71,41 @@ Rp {{ number_format($kamars->first()->harga,0,',','.') }}
 
 </div>
 
+{{-- ERROR --}}
+@if(session('error'))
+<div class="bg-red-100 text-red-600 p-3 rounded">
+    {{ session('error') }}
+</div>
+@endif
+
 {{-- FORM --}}
+<form method="POST" action="{{ route('user.pengajuan.create', $kost->id) }}" onsubmit="return validasiForm()">
+@csrf
+
+<input type="hidden" name="kamar_id" id="kamar_id_input">
+
 <div class="bg-white border rounded-2xl p-6">
 
-<input type="hidden" id="kamar_id_input">
-
 <div class="space-y-4">
-<input type="number" id="jumlah_orang" value="1" min="1" max="2"
-class="w-full border rounded-lg px-3 py-2">
+    <input type="number" name="jumlah_orang" id="jumlah_orang"
+        value="1" min="1" max="2"
+        class="w-full border rounded-lg px-3 py-2" required>
 
-<input type="date" id="tgl_masuk"
-class="w-full border rounded-lg px-3 py-2">
+    <input type="date" name="tgl_masuk" id="tgl_masuk"
+        class="w-full border rounded-lg px-3 py-2" required>
 </div>
 
 <div id="kamar-terpilih" class="hidden mt-3 text-blue-600 text-sm">
-Kamar: <span id="kamar-terpilih-label"></span>
+    Kamar: <span id="kamar-terpilih-label"></span>
 </div>
 
-<button onclick="kirimWhatsApp()"
+<button type="submit"
 class="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg">
 Ajukan Sewa
 </button>
 
 </div>
+</form>
 
 </div>
 
@@ -131,6 +143,8 @@ Rp {{ number_format($kost->harga,0,',','.') }}
 <script>
 function pilihTipe(el, kamarId, harga){
 
+console.log("PILIH KAMAR:", kamarId);
+
 document.querySelectorAll('.tipe-card').forEach(c=>{
 c.classList.remove('border-blue-500','bg-blue-50');
 });
@@ -158,32 +172,15 @@ document.getElementById('total-display').textContent =
 'Rp '+harga.toLocaleString('id-ID');
 }
 
-function kirimWhatsApp(){
-
+function validasiForm(){
 let kamar = document.getElementById('kamar_id_input').value;
-let tgl = document.getElementById('tgl_masuk').value;
-let jumlah = document.getElementById('jumlah_orang').value;
 
-if(!kamar){ alert('Pilih kamar dulu'); return; }
-if(!tgl){ alert('Isi tanggal'); return; }
+if(!kamar){
+    alert("Pilih kamar dulu!");
+    return false;
+}
 
-let noHp = "6282179929901";
-let nama = "{{ Auth::user()->username }}";
-
-let pesan = `Halo, saya ${nama} ingin sewa kost.
-
-Jumlah: ${jumlah}
-Tanggal: ${tgl}`;
-
-let url = `https://wa.me/${noHp}?text=${encodeURIComponent(pesan)}`;
-
-// buka WA
-window.open(url, '_blank');
-
-// redirect halaman
-setTimeout(()=>{
-window.location.href = "/user/menunggu-persetujuan";
-},1000);
+return true;
 }
 </script>
 

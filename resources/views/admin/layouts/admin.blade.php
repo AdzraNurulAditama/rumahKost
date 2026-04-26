@@ -59,12 +59,6 @@ function activeMenu($route)
                 <span class="font-semibold text-sm">Pesan</span>
             </a>
 
-            <a href="{{ route('admin.pembayaran.index') }}" class="flex items-center gap-4 px-4 py-3 rounded-xl {{ activeMenu('admin.pembayaran.*') }}">
-                <i class="fa-solid fa-money-bill-wave w-5"></i>
-                <span class="font-semibold text-sm">Kelola Pembayaran</span>
-            </a>
-        </nav>
-
         <div class="p-6 border-t border-gray-50">
             <form action="{{ route('admin.logout') }}" method="POST">
                 @csrf
