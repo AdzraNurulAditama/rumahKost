@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ config('app.name', 'RumahKost') }}</title>
+    <title>{{ config('app.name', 'RumahKostPutri') }}</title>
 
     {{-- Tailwind CDN --}}
     <script src="https://cdn.tailwindcss.com"></script>
 
-    {{-- Alpine JS (buat carousel) --}}
+    {{-- Alpine JS --}}
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     {{-- Font Awesome --}}
@@ -20,47 +20,60 @@
 
     {{-- NAVBAR --}}
     <nav class="bg-white shadow-sm">
+        
         <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
 
             {{-- LOGO --}}
-            <a href="{{ route('home') }}" class="text-2xl font-bold">
-                <span class="text-blue-600">Rumah</span>
-                <span class="text-orange-400">Kost</span>
+            <a href="{{ route('home') }}" class="text-3xl font-extrabold tracking-tight">
+
+                <span class="text-blue-700">
+                    Rumah<span class="text-orange-400">Kost</span><span class="text-pink-400">Putri</span>
+                </span>
+
             </a>
 
             {{-- MENU --}}
             <div class="flex items-center gap-6">
 
-                <a href="{{ route('home') }}" class="hover:text-blue-600">
+                <a href="{{ route('home') }}"
+                   class="hover:text-blue-600 font-medium transition">
                     Beranda
                 </a>
 
                 @auth
+
                     <a href="{{ route('admin.dashboard') }}"
-                        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                       class="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition shadow">
                         Dashboard
                     </a>
 
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
+
                         <button class="text-red-500 hover:underline">
                             Logout
                         </button>
+
                     </form>
+
                 @else
-                    <a href="{{ route('login') }}" class="hover:text-blue-600">
+
+                    <a href="{{ route('login') }}"
+                       class="hover:text-blue-600 font-medium transition">
                         Login
                     </a>
 
                     <a href="{{ route('register') }}"
-                        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                       class="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition shadow">
                         Register
                     </a>
+
                 @endauth
 
             </div>
 
         </div>
+
     </nav>
 
     {{-- CONTENT --}}
