@@ -244,7 +244,7 @@
                 <p class="text-xs text-gray-400 mb-4">/bulan</p>
 
                 @if($sisaKamar > 0)
-                    <a href="{{ route('user.pengajuan', $kost->id) }}"
+                    <a href="{{ route('user.pengajuan.show', $kost->id) }}"
                        class="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-3 rounded-xl font-semibold transition duration-200 shadow">
                         Ajukan Sewa
                     </a>

@@ -44,9 +44,6 @@
                 <div>
                     <p class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-3 px-2">Aktivitas</p>
                     <div class="space-y-1">
-                        <a href="{{ route('user.transaksi') }}" class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-gray-600 bg-white rounded-xl shadow-sm border border-gray-50">
-                            <i class="fa-solid fa-clipboard-list w-4 text-gray-500"></i> Daftar Transaksi
-                        </a>
                         <a href="{{ route('user.disukai') }}" class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-gray-600 hover:bg-white/50 transition rounded-xl">
                             <i class="fa-solid fa-heart w-4 text-gray-500"></i> Disukai
                         </a>
