@@ -10,7 +10,6 @@ use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KelolaKostController;
 use App\Http\Controllers\UserProfileController;
-use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\PengajuanController;
 use App\Http\Controllers\KelolaKamarController;
 use App\Http\Controllers\PenyewaController;

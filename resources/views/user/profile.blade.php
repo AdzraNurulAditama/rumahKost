@@ -36,9 +36,13 @@
                 <div>
                     <p class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-3 px-2">Aktivitas</p>
                     <div class="space-y-1">
+<<<<<<< HEAD
 
                         <a href="{{ route('user.disukai') }}"
                            class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-gray-600 hover:bg-white/50 transition rounded-xl">
+=======
+                        <a href="{{ route('user.disukai') }}" class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-gray-600 hover:bg-white/50 transition rounded-xl">
+>>>>>>> a83547f3d4e94dc5f75ccd4b6d2ebccbc4708697
                             <i class="fa-solid fa-heart w-4 text-gray-500"></i> Disukai
                         </a>
 
