@@ -6,7 +6,7 @@
 
 {{-- ❤️ TOAST NOTIF --}}
 <div id="toast"
-     class="fixed top-6 right-6 z-50 flex items-center gap-3 bg-white border border-gray-100 shadow-xl rounded-2xl px-5 py-4 transition-all duration-500 opacity-0 translate-y-[-20px] pointer-events-none"
+     class="fixed bottom-6 right-6 z-50 ... opacity-0 translate-y-[20px] pointer-events-none"
      style="min-width:260px">
     <div id="toast-icon" class="w-9 h-9 rounded-full flex items-center justify-center text-lg shrink-0"></div>
     <div>
@@ -244,7 +244,7 @@
                 <p class="text-xs text-gray-400 mb-4">/bulan</p>
 
                 @if($sisaKamar > 0)
-                    <a href="{{ route('user.pengajuan', $kost->id) }}"
+                    <a href="{{ route('user.pengajuan.show', $kost->id) }}"
                        class="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-3 rounded-xl font-semibold transition duration-200 shadow">
                         Ajukan Sewa
                     </a>
@@ -377,14 +377,14 @@ document.addEventListener('DOMContentLoaded', function(){
         }
 
         // Tampilkan
-        toast.classList.remove('opacity-0', 'translate-y-[-20px]', 'pointer-events-none');
+        toast.classList.remove('opacity-0', 'translate-y-[20px]', 'pointer-events-none');
         toast.classList.add('opacity-100', 'translate-y-0');
 
         // Sembunyikan setelah 3.5 detik
         clearTimeout(window._toastTimer);
         window._toastTimer = setTimeout(() => {
             toast.classList.remove('opacity-100', 'translate-y-0');
-            toast.classList.add('opacity-0', 'translate-y-[-20px]', 'pointer-events-none');
+            toast.classList.add('opacity-0', 'translate-y-[20px]', 'pointer-events-none');
         }, 3500);
     }
 

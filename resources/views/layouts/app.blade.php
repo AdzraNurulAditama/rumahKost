@@ -112,7 +112,7 @@
 </nav>
 
 {{-- ================= CONTENT ================= --}}
-<main class="min-h-screen pb-10 relative z-0">
+<main class="min-h-screen pb-10">
     @yield('content')
 </main>
 

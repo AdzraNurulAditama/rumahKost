@@ -18,6 +18,7 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\ChatController;
 
+
 /*
 |--------------------------------------------------------------------------
 | PUBLIC
@@ -74,6 +75,8 @@ Route::prefix('user')->name('user.')->middleware('auth')->group(function () {
     // batal
     Route::delete('/pengajuan/{id}', [PengajuanController::class, 'batal'])->name('pengajuan.batal');
 
+    // ✅ FIX: route yang hilang
+    Route::get('/pengajuan/{id}/status', [PengajuanController::class, 'status'])->name('pengajuan.status');
 
     Route::get('/sewa', [PengajuanController::class,'riwayat'])->name('sewa');
     Route::get('/kosan-saya', [PenyewaController::class,'kosanSaya'])->name('kosan.saya');
